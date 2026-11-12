@@ -30,3 +30,15 @@ export function screenHeaderOptions(title: string) {
     ...(Platform.OS === "ios" ? iosHeaderOptions : androidHeaderOptions),
   };
 }
+
+/** Compact modal/detail header — no large title on either platform. */
+export function detailScreenHeaderOptions(title: string) {
+  return {
+    title,
+    ...sharedHeaderOptions,
+    headerTransparent: false,
+    headerLargeTitleEnabled: false,
+    headerShadowVisible: false,
+    headerStyle: { backgroundColor: "#F7F4EF" },
+  };
+}

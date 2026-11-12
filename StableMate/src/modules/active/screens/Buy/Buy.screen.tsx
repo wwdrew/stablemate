@@ -1,5 +1,12 @@
 import { LegendList } from "@legendapp/list/react-native";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Link } from "expo-router";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { useMarketLot } from "@/api/useMarketLot";
 import type { MarketListing } from "@/api/marketLot";
@@ -9,20 +16,28 @@ function ListingRow({ item }: { item: MarketListing }) {
   const types = item.types.join(" / ");
 
   return (
-    <View style={styles.row}>
-      <View style={styles.rowCopy}>
-        <Text style={styles.rowName}>{item.name}</Text>
-        <Text style={styles.rowMeta}>
-          {types} · {record}
-        </Text>
-      </View>
-      <View style={styles.priceBlock}>
-        <Text style={styles.price}>${item.markPrice}</Text>
-        {item.markPrice !== item.listPrice ? (
-          <Text style={styles.listPrice}>list ${item.listPrice}</Text>
-        ) : null}
-      </View>
-    </View>
+    <Link
+      href={{
+        pathname: "/buy/[listingId]",
+        params: { listingId: item.id },
+      }}
+      asChild
+    >
+      <Pressable style={styles.row}>
+        <View style={styles.rowCopy}>
+          <Text style={styles.rowName}>{item.name}</Text>
+          <Text style={styles.rowMeta}>
+            {types} · {record}
+          </Text>
+        </View>
+        <View style={styles.priceBlock}>
+          <Text style={styles.price}>${item.markPrice}</Text>
+          {item.markPrice !== item.listPrice ? (
+            <Text style={styles.listPrice}>list ${item.listPrice}</Text>
+          ) : null}
+        </View>
+      </Pressable>
+    </Link>
   );
 }
 

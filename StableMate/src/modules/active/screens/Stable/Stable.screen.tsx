@@ -1,4 +1,5 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Link } from "expo-router";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { type OwnedPokemon, useGameStore } from "@/store/game";
@@ -9,10 +10,18 @@ function StableRow({ item }: { item: OwnedPokemon }) {
   );
 
   return (
-    <View style={styles.row}>
-      <Text style={styles.rowName}>{species?.name ?? item.speciesId}</Text>
-      <Text style={styles.rowType}>{species?.type ?? "—"}</Text>
-    </View>
+    <Link
+      href={{
+        pathname: "/stable/[ownedId]",
+        params: { ownedId: item.id },
+      }}
+      asChild
+    >
+      <Pressable style={styles.row}>
+        <Text style={styles.rowName}>{species?.name ?? item.speciesId}</Text>
+        <Text style={styles.rowType}>{species?.type ?? "—"}</Text>
+      </Pressable>
+    </Link>
   );
 }
 
