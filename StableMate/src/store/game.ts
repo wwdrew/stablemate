@@ -79,3 +79,6 @@ export const useGameStore = create<GameStore>()(
 
 export const useHasGameState = () =>
   useGameStore((store) => store.state !== null);
+
+export const useRoundsPlayed = () =>
+  useGameStore((store) => store.state?.roundsPlayed ?? 0);

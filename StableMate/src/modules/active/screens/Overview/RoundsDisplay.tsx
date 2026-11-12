@@ -1,8 +1,8 @@
-import { useGameStore } from "@/store/game";
+import { useGameStore, useRoundsPlayed } from "@/store/game";
 import { View, Text, StyleSheet } from "react-native";
 
 export function RoundsDisplay() {
-  const roundsPlayed = useGameStore((store) => store.state?.roundsPlayed);
+  const roundsPlayed = useRoundsPlayed();
 
   return (
     <View style={styles.card}>
