@@ -1,0 +1,678 @@
+{
+  "version": 1,
+  "source": "https://pokeapi.co",
+  "generatedAt": "2026-11-12T15:53:18.277Z",
+  "count": 30,
+  "species": [
+    {
+      "id": 1,
+      "slug": "bulbasaur",
+      "name": "Bulbasaur",
+      "types": [
+        "grass",
+        "poison"
+      ],
+      "stats": {
+        "hp": 45,
+        "attack": 49,
+        "defense": 49,
+        "specialAttack": 65,
+        "specialDefense": 65,
+        "speed": 45,
+        "total": 318
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+      },
+      "listPrice": 438
+    },
+    {
+      "id": 4,
+      "slug": "charmander",
+      "name": "Charmander",
+      "types": [
+        "fire"
+      ],
+      "stats": {
+        "hp": 39,
+        "attack": 52,
+        "defense": 43,
+        "specialAttack": 60,
+        "specialDefense": 50,
+        "speed": 65,
+        "total": 309
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png"
+      },
+      "listPrice": 426
+    },
+    {
+      "id": 6,
+      "slug": "charizard",
+      "name": "Charizard",
+      "types": [
+        "fire",
+        "flying"
+      ],
+      "stats": {
+        "hp": 78,
+        "attack": 84,
+        "defense": 78,
+        "specialAttack": 109,
+        "specialDefense": 85,
+        "speed": 100,
+        "total": 534
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
+      },
+      "listPrice": 708
+    },
+    {
+      "id": 7,
+      "slug": "squirtle",
+      "name": "Squirtle",
+      "types": [
+        "water"
+      ],
+      "stats": {
+        "hp": 44,
+        "attack": 48,
+        "defense": 65,
+        "specialAttack": 50,
+        "specialDefense": 64,
+        "speed": 43,
+        "total": 314
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png"
+      },
+      "listPrice": 433
+    },
+    {
+      "id": 9,
+      "slug": "blastoise",
+      "name": "Blastoise",
+      "types": [
+        "water"
+      ],
+      "stats": {
+        "hp": 79,
+        "attack": 83,
+        "defense": 100,
+        "specialAttack": 85,
+        "specialDefense": 105,
+        "speed": 78,
+        "total": 530
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png"
+      },
+      "listPrice": 703
+    },
+    {
+      "id": 25,
+      "slug": "pikachu",
+      "name": "Pikachu",
+      "types": [
+        "electric"
+      ],
+      "stats": {
+        "hp": 35,
+        "attack": 55,
+        "defense": 40,
+        "specialAttack": 50,
+        "specialDefense": 50,
+        "speed": 90,
+        "total": 320
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
+      },
+      "listPrice": 440
+    },
+    {
+      "id": 26,
+      "slug": "raichu",
+      "name": "Raichu",
+      "types": [
+        "electric"
+      ],
+      "stats": {
+        "hp": 60,
+        "attack": 90,
+        "defense": 55,
+        "specialAttack": 90,
+        "specialDefense": 80,
+        "speed": 110,
+        "total": 485
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png"
+      },
+      "listPrice": 646
+    },
+    {
+      "id": 37,
+      "slug": "vulpix",
+      "name": "Vulpix",
+      "types": [
+        "fire"
+      ],
+      "stats": {
+        "hp": 38,
+        "attack": 41,
+        "defense": 40,
+        "specialAttack": 50,
+        "specialDefense": 65,
+        "speed": 65,
+        "total": 299
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/37.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/37.png"
+      },
+      "listPrice": 414
+    },
+    {
+      "id": 38,
+      "slug": "ninetales",
+      "name": "Ninetales",
+      "types": [
+        "fire"
+      ],
+      "stats": {
+        "hp": 73,
+        "attack": 76,
+        "defense": 75,
+        "specialAttack": 81,
+        "specialDefense": 100,
+        "speed": 100,
+        "total": 505
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/38.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/38.png"
+      },
+      "listPrice": 671
+    },
+    {
+      "id": 54,
+      "slug": "psyduck",
+      "name": "Psyduck",
+      "types": [
+        "water"
+      ],
+      "stats": {
+        "hp": 50,
+        "attack": 52,
+        "defense": 48,
+        "specialAttack": 65,
+        "specialDefense": 50,
+        "speed": 55,
+        "total": 320
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png"
+      },
+      "listPrice": 440
+    },
+    {
+      "id": 58,
+      "slug": "growlithe",
+      "name": "Growlithe",
+      "types": [
+        "fire"
+      ],
+      "stats": {
+        "hp": 55,
+        "attack": 70,
+        "defense": 45,
+        "specialAttack": 70,
+        "specialDefense": 50,
+        "speed": 60,
+        "total": 350
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/58.png"
+      },
+      "listPrice": 478
+    },
+    {
+      "id": 59,
+      "slug": "arcanine",
+      "name": "Arcanine",
+      "types": [
+        "fire"
+      ],
+      "stats": {
+        "hp": 90,
+        "attack": 110,
+        "defense": 80,
+        "specialAttack": 100,
+        "specialDefense": 80,
+        "speed": 95,
+        "total": 555
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/59.png"
+      },
+      "listPrice": 734
+    },
+    {
+      "id": 63,
+      "slug": "abra",
+      "name": "Abra",
+      "types": [
+        "psychic"
+      ],
+      "stats": {
+        "hp": 25,
+        "attack": 20,
+        "defense": 15,
+        "specialAttack": 105,
+        "specialDefense": 55,
+        "speed": 90,
+        "total": 310
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/63.png"
+      },
+      "listPrice": 428
+    },
+    {
+      "id": 66,
+      "slug": "machop",
+      "name": "Machop",
+      "types": [
+        "fighting"
+      ],
+      "stats": {
+        "hp": 70,
+        "attack": 80,
+        "defense": 50,
+        "specialAttack": 35,
+        "specialDefense": 35,
+        "speed": 35,
+        "total": 305
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/66.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/66.png"
+      },
+      "listPrice": 421
+    },
+    {
+      "id": 74,
+      "slug": "geodude",
+      "name": "Geodude",
+      "types": [
+        "rock",
+        "ground"
+      ],
+      "stats": {
+        "hp": 40,
+        "attack": 80,
+        "defense": 100,
+        "specialAttack": 30,
+        "specialDefense": 30,
+        "speed": 20,
+        "total": 300
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/74.png"
+      },
+      "listPrice": 415
+    },
+    {
+      "id": 92,
+      "slug": "gastly",
+      "name": "Gastly",
+      "types": [
+        "ghost",
+        "poison"
+      ],
+      "stats": {
+        "hp": 30,
+        "attack": 35,
+        "defense": 30,
+        "specialAttack": 100,
+        "specialDefense": 35,
+        "speed": 80,
+        "total": 310
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/92.png"
+      },
+      "listPrice": 428
+    },
+    {
+      "id": 94,
+      "slug": "gengar",
+      "name": "Gengar",
+      "types": [
+        "ghost",
+        "poison"
+      ],
+      "stats": {
+        "hp": 60,
+        "attack": 65,
+        "defense": 60,
+        "specialAttack": 130,
+        "specialDefense": 75,
+        "speed": 110,
+        "total": 500
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png"
+      },
+      "listPrice": 665
+    },
+    {
+      "id": 95,
+      "slug": "onix",
+      "name": "Onix",
+      "types": [
+        "rock",
+        "ground"
+      ],
+      "stats": {
+        "hp": 35,
+        "attack": 45,
+        "defense": 160,
+        "specialAttack": 30,
+        "specialDefense": 45,
+        "speed": 70,
+        "total": 385
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/95.png"
+      },
+      "listPrice": 521
+    },
+    {
+      "id": 104,
+      "slug": "cubone",
+      "name": "Cubone",
+      "types": [
+        "ground"
+      ],
+      "stats": {
+        "hp": 50,
+        "attack": 50,
+        "defense": 95,
+        "specialAttack": 40,
+        "specialDefense": 50,
+        "speed": 35,
+        "total": 320
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/104.png"
+      },
+      "listPrice": 440
+    },
+    {
+      "id": 113,
+      "slug": "chansey",
+      "name": "Chansey",
+      "types": [
+        "normal"
+      ],
+      "stats": {
+        "hp": 250,
+        "attack": 5,
+        "defense": 5,
+        "specialAttack": 35,
+        "specialDefense": 105,
+        "speed": 50,
+        "total": 450
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/113.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/113.png"
+      },
+      "listPrice": 603
+    },
+    {
+      "id": 123,
+      "slug": "scyther",
+      "name": "Scyther",
+      "types": [
+        "bug",
+        "flying"
+      ],
+      "stats": {
+        "hp": 70,
+        "attack": 110,
+        "defense": 80,
+        "specialAttack": 55,
+        "specialDefense": 80,
+        "speed": 105,
+        "total": 500
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/123.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/123.png"
+      },
+      "listPrice": 665
+    },
+    {
+      "id": 125,
+      "slug": "electabuzz",
+      "name": "Electabuzz",
+      "types": [
+        "electric"
+      ],
+      "stats": {
+        "hp": 65,
+        "attack": 83,
+        "defense": 57,
+        "specialAttack": 95,
+        "specialDefense": 85,
+        "speed": 105,
+        "total": 490
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/125.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/125.png"
+      },
+      "listPrice": 653
+    },
+    {
+      "id": 126,
+      "slug": "magmar",
+      "name": "Magmar",
+      "types": [
+        "fire"
+      ],
+      "stats": {
+        "hp": 65,
+        "attack": 95,
+        "defense": 57,
+        "specialAttack": 100,
+        "specialDefense": 85,
+        "speed": 93,
+        "total": 495
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/126.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/126.png"
+      },
+      "listPrice": 659
+    },
+    {
+      "id": 130,
+      "slug": "gyarados",
+      "name": "Gyarados",
+      "types": [
+        "water",
+        "flying"
+      ],
+      "stats": {
+        "hp": 95,
+        "attack": 125,
+        "defense": 79,
+        "specialAttack": 60,
+        "specialDefense": 100,
+        "speed": 81,
+        "total": 540
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png"
+      },
+      "listPrice": 715
+    },
+    {
+      "id": 131,
+      "slug": "lapras",
+      "name": "Lapras",
+      "types": [
+        "water",
+        "ice"
+      ],
+      "stats": {
+        "hp": 130,
+        "attack": 85,
+        "defense": 80,
+        "specialAttack": 85,
+        "specialDefense": 95,
+        "speed": 60,
+        "total": 535
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png"
+      },
+      "listPrice": 709
+    },
+    {
+      "id": 133,
+      "slug": "eevee",
+      "name": "Eevee",
+      "types": [
+        "normal"
+      ],
+      "stats": {
+        "hp": 55,
+        "attack": 55,
+        "defense": 50,
+        "specialAttack": 45,
+        "specialDefense": 65,
+        "speed": 55,
+        "total": 325
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png"
+      },
+      "listPrice": 446
+    },
+    {
+      "id": 134,
+      "slug": "vaporeon",
+      "name": "Vaporeon",
+      "types": [
+        "water"
+      ],
+      "stats": {
+        "hp": 130,
+        "attack": 65,
+        "defense": 60,
+        "specialAttack": 110,
+        "specialDefense": 95,
+        "speed": 65,
+        "total": 525
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/134.png"
+      },
+      "listPrice": 696
+    },
+    {
+      "id": 143,
+      "slug": "snorlax",
+      "name": "Snorlax",
+      "types": [
+        "normal"
+      ],
+      "stats": {
+        "hp": 160,
+        "attack": 110,
+        "defense": 65,
+        "specialAttack": 65,
+        "specialDefense": 110,
+        "speed": 30,
+        "total": 540
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png"
+      },
+      "listPrice": 715
+    },
+    {
+      "id": 147,
+      "slug": "dratini",
+      "name": "Dratini",
+      "types": [
+        "dragon"
+      ],
+      "stats": {
+        "hp": 41,
+        "attack": 64,
+        "defense": 45,
+        "specialAttack": 50,
+        "specialDefense": 50,
+        "speed": 50,
+        "total": 300
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/147.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/147.png"
+      },
+      "listPrice": 415
+    },
+    {
+      "id": 149,
+      "slug": "dragonite",
+      "name": "Dragonite",
+      "types": [
+        "dragon",
+        "flying"
+      ],
+      "stats": {
+        "hp": 91,
+        "attack": 134,
+        "defense": 95,
+        "specialAttack": 100,
+        "specialDefense": 100,
+        "speed": 80,
+        "total": 600
+      },
+      "sprites": {
+        "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+        "artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png"
+      },
+      "listPrice": 790
+    }
+  ]
+}

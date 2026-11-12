@@ -43,7 +43,8 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "catalog:fetch": "node ./scripts/fetch-catalog.mjs"
   },
   "private": true
 }
