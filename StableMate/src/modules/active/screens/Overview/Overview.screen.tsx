@@ -43,10 +43,8 @@ export function OverviewScreen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.label}>Stable</Text>
-        <Text style={styles.placeholder}>
-          Owned Pokémon will show here. Detail / battle comes next.
-        </Text>
+        <Text style={styles.label}>Stable size</Text>
+        <Text style={styles.value}>{state?.stable?.length ?? 0}</Text>
       </View>
     </View>
   );
@@ -91,9 +89,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#78716C",
   },
-  placeholder: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#57534E",
-  },
 });
+

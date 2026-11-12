@@ -11,6 +11,14 @@ export default function AppTabsLayout() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="stable">
+        <NativeTabs.Trigger.Label>Stable</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "square.stack", selected: "square.stack.fill" }}
+          md={{ default: "stacks", selected: "stacks" }}
+        />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="buy">
         <NativeTabs.Trigger.Label>Buy</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon

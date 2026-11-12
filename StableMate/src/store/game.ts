@@ -5,9 +5,15 @@ import { mmkvStorage } from "@/store/mmkv";
 
 export type StarterId = "bulbasaur" | "charmander" | "squirtle";
 
+export type OwnedPokemon = {
+  id: string;
+  speciesId: StarterId;
+};
+
 export type GameState = {
   starterId: StarterId;
   roundsPlayed: number;
+  stable: OwnedPokemon[];
 };
 
 type GameStore = {
@@ -25,6 +31,12 @@ export const useGameStore = create<GameStore>()(
           state: {
             starterId,
             roundsPlayed: 0,
+            stable: [
+              {
+                id: `${starterId}-starter`,
+                speciesId: starterId,
+              },
+            ],
           },
         }),
       clearState: () =>
@@ -38,6 +50,29 @@ export const useGameStore = create<GameStore>()(
       partialize: (store) => ({
         state: store.state,
       }),
+      merge: (persisted, current) => {
+        const persistedStore = persisted as Partial<GameStore> | undefined;
+        const state = persistedStore?.state;
+
+        if (!state) {
+          return current;
+        }
+
+        return {
+          ...current,
+          ...persistedStore,
+          state: {
+            ...state,
+            roundsPlayed: state.roundsPlayed ?? 0,
+            stable: state.stable ?? [
+              {
+                id: `${state.starterId}-starter`,
+                speciesId: state.starterId,
+              },
+            ],
+          },
+        };
+      },
     },
   ),
 );
