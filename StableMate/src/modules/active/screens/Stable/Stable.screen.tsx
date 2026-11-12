@@ -1,6 +1,4 @@
-import { LegendList } from "@legendapp/list/react-native";
-import { StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { type OwnedPokemon, useGameStore } from "@/store/game";
@@ -19,61 +17,49 @@ function StableRow({ item }: { item: OwnedPokemon }) {
 }
 
 export function StableScreen() {
-  const insets = useSafeAreaInsets();
   const stable = useGameStore((store) => store.state?.stable ?? []);
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + 16 }]}>
-      <Text style={styles.title}>Stable</Text>
-      <Text style={styles.subtitle}>
-        {stable.length === 1
-          ? "1 Pokémon owned"
-          : `${stable.length} Pokémon owned`}
-      </Text>
-
-      <LegendList
-        data={stable}
-        keyExtractor={(item) => item.id}
-        recycleItems
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>Empty stable</Text>
-            <Text style={styles.emptyBody}>
-              Buy from the market to grow your roster.
-            </Text>
-          </View>
-        }
-        renderItem={({ item }) => <StableRow item={item} />}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-    </View>
+    <FlatList
+      data={stable}
+      keyExtractor={(item) => item.id}
+      contentInsetAdjustmentBehavior="automatic"
+      style={styles.list}
+      contentContainerStyle={styles.listContent}
+      ListHeaderComponent={
+        <Text style={styles.subtitle}>
+          {stable.length === 1
+            ? "1 Pokémon owned"
+            : `${stable.length} Pokémon owned`}
+        </Text>
+      }
+      ListEmptyComponent={
+        <View style={styles.empty}>
+          <Text style={styles.emptyTitle}>Empty stable</Text>
+          <Text style={styles.emptyBody}>
+            Buy from the market to grow your roster.
+          </Text>
+        </View>
+      }
+      renderItem={({ item }) => <StableRow item={item} />}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  list: {
     flex: 1,
     backgroundColor: "#F7F4EF",
-    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1C1917",
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   subtitle: {
-    marginTop: 4,
     marginBottom: 16,
     fontSize: 15,
     color: "#78716C",
-  },
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    paddingBottom: 24,
   },
   row: {
     backgroundColor: "#FFFCF7",

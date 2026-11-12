@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { useGameStore } from "@/store/game";
@@ -14,7 +13,6 @@ import { useGameStore } from "@/store/game";
  */
 
 export function OverviewScreen() {
-  const insets = useSafeAreaInsets();
   const state = useGameStore((store) => store.state);
 
   const starter = STARTER_OPTIONS.find(
@@ -22,8 +20,11 @@ export function OverviewScreen() {
   );
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + 16 }]}>
-      <Text style={styles.title}>Overview</Text>
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+    >
       <Text style={styles.subtitle}>Your stable at a glance.</Text>
 
       <View style={styles.card}>
@@ -46,7 +47,7 @@ export function OverviewScreen() {
         <Text style={styles.label}>Stable size</Text>
         <Text style={styles.value}>{state?.stable?.length ?? 0}</Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -54,18 +55,16 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: "#F7F4EF",
-    paddingHorizontal: 20,
-    gap: 12,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1C1917",
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 24,
+    gap: 12,
   },
   subtitle: {
     fontSize: 15,
     color: "#78716C",
-    marginBottom: 8,
+    marginBottom: 4,
   },
   card: {
     backgroundColor: "#FFFCF7",
@@ -90,4 +89,3 @@ const styles = StyleSheet.create({
     color: "#78716C",
   },
 });
-
