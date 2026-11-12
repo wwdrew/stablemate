@@ -3,6 +3,9 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { useGameStore } from "@/store/game";
 
+import { CashDisplay } from "./CashDisplay";
+import { RoundsDisplay } from "./RoundsDisplay";
+
 /**
  * FUTURE — cash-over-time chart on Overview
  * - Height ≈ 50% of screen width
@@ -27,14 +30,9 @@ export function OverviewScreen() {
     >
       <Text style={styles.subtitle}>Your stable at a glance.</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Cash</Text>
-        <Text style={styles.value}>$0</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>Rounds played</Text>
-        <Text style={styles.value}>{state?.roundsPlayed ?? 0}</Text>
+      <View style={styles.row}>
+        <CashDisplay />
+        <RoundsDisplay />
       </View>
 
       <View style={styles.card}>
@@ -87,5 +85,9 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: 14,
     color: "#78716C",
+  },
+  row: {
+    flexDirection: "row",
+    gap: 12,
   },
 });
