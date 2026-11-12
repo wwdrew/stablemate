@@ -8,7 +8,8 @@
     "scheme": "stablemate",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.wwdrew.StableMate"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,6 +22,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-dev-client",
       [
         "expo-splash-screen",
         {
