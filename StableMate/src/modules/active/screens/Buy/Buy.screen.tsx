@@ -1,13 +1,49 @@
 import { LegendList } from "@legendapp/list/react-native";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-type MarketListing = {
-  id: string;
-  name: string;
-};
+import { useMarketLot } from "@/api/useMarketLot";
+import type { MarketListing } from "@/api/marketLot";
+
+function ListingRow({ item }: { item: MarketListing }) {
+  const record = `${item.wins}W–${item.losses}L`;
+  const types = item.types.join(" / ");
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowCopy}>
+        <Text style={styles.rowName}>{item.name}</Text>
+        <Text style={styles.rowMeta}>
+          {types} · {record}
+        </Text>
+      </View>
+      <View style={styles.priceBlock}>
+        <Text style={styles.price}>${item.markPrice}</Text>
+        {item.markPrice !== item.listPrice ? (
+          <Text style={styles.listPrice}>list ${item.listPrice}</Text>
+        ) : null}
+      </View>
+    </View>
+  );
+}
 
 export function BuyScreen() {
-  const listings: MarketListing[] = [];
+  const { data: listings = [], isPending, isError } = useMarketLot();
+
+  if (isPending) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.emptyTitle}>Couldn’t load market lot</Text>
+      </View>
+    );
+  }
 
   return (
     <LegendList
@@ -18,7 +54,9 @@ export function BuyScreen() {
       style={styles.list}
       contentContainerStyle={styles.listContent}
       ListHeaderComponent={
-        <Text style={styles.subtitle}>This round’s market lot.</Text>
+        <Text style={styles.subtitle}>
+          This round’s market lot · {listings.length} for sale
+        </Text>
       }
       ListEmptyComponent={
         <View style={styles.empty}>
@@ -29,11 +67,7 @@ export function BuyScreen() {
           </Text>
         </View>
       }
-      renderItem={({ item }) => (
-        <View style={styles.row}>
-          <Text style={styles.rowName}>{item.name}</Text>
-        </View>
-      )}
+      renderItem={({ item }) => <ListingRow item={item} />}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
     />
   );
@@ -58,11 +92,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E7E5E4",
     padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  rowCopy: {
+    flex: 1,
+    gap: 4,
   },
   rowName: {
     fontSize: 17,
     fontWeight: "600",
     color: "#1C1917",
+  },
+  rowMeta: {
+    fontSize: 13,
+    color: "#78716C",
+    textTransform: "capitalize",
+  },
+  priceBlock: {
+    alignItems: "flex-end",
+    gap: 2,
+  },
+  price: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1C1917",
+  },
+  listPrice: {
+    fontSize: 12,
+    color: "#A8A29E",
   },
   separator: {
     height: 10,
@@ -83,5 +142,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     color: "#57534E",
+  },
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F7F4EF",
+    padding: 24,
   },
 });
