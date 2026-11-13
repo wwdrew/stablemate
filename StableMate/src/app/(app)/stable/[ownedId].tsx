@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import type { CatalogSpecies } from "@/data/catalog.schema";
@@ -8,6 +8,7 @@ import { BattleAction } from "@/modules/active/screens/PokemonDetail/BattleActio
 import { BattleOverlay } from "@/modules/active/screens/PokemonDetail/BattleOverlay";
 import {
   pickChallenger,
+  prizeMoneyForWin,
   rollPlayerWins,
 } from "@/modules/active/screens/PokemonDetail/battle";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
@@ -17,6 +18,7 @@ import { useGameStore } from "@/store/game";
 type BattleSession = {
   challenger: CatalogSpecies;
   playerWins: boolean;
+  prizeMoney: number;
 };
 
 export default function StableOwnedDetailRoute() {
@@ -24,9 +26,15 @@ export default function StableOwnedDetailRoute() {
   const owned = useGameStore((store) =>
     store.state?.stable.find((item) => item.id === ownedId),
   );
+  const battleHistory = useGameStore((store) => store.state?.battleHistory ?? []);
+  const resolveBattle = useGameStore((store) => store.resolveBattle);
   const [battle, setBattle] = useState<BattleSession | null>(null);
 
   const pokemon = owned ? pokemonFromOwned(owned) : null;
+  const ownedBattleHistory = useMemo(
+    () => battleHistory.filter((entry) => entry.ownedId === ownedId),
+    [battleHistory, ownedId],
+  );
 
   if (!pokemon) {
     return (
@@ -47,13 +55,17 @@ export default function StableOwnedDetailRoute() {
       <Stack.Screen options={detailScreenHeaderOptions(pokemon.name)} />
       <PokemonDetailScreen
         pokemon={pokemon}
+        battleHistory={ownedBattleHistory}
         actions={
           <BattleAction
             disabled={battle !== null}
             onPress={() => {
+              const challenger = pickChallenger(pokemon.slug);
+              const playerWins = rollPlayerWins();
               setBattle({
-                challenger: pickChallenger(pokemon.slug),
-                playerWins: rollPlayerWins(),
+                challenger,
+                playerWins,
+                prizeMoney: playerWins ? prizeMoneyForWin(challenger) : 0,
               });
             }}
           />
@@ -64,7 +76,17 @@ export default function StableOwnedDetailRoute() {
           player={pokemon}
           challenger={battle.challenger}
           playerWins={battle.playerWins}
-          onFinished={() => setBattle(null)}
+          prizeMoney={battle.prizeMoney}
+          onFinished={() => {
+            resolveBattle({
+              ownedId: pokemon.id,
+              challengerSlug: battle.challenger.slug,
+              challengerName: battle.challenger.name,
+              won: battle.playerWins,
+              prizeMoney: battle.prizeMoney,
+            });
+            setBattle(null);
+          }}
         />
       ) : null}
     </>

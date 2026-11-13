@@ -3,9 +3,11 @@ import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
+import type { BattleRecord } from "@/store/game";
 
 type PokemonDetailScreenProps = {
   pokemon: PokemonInstance;
+  battleHistory?: BattleRecord[];
   actions?: ReactNode;
 };
 
@@ -23,6 +25,7 @@ const STAT_ROWS: {
 
 export function PokemonDetailScreen({
   pokemon,
+  battleHistory,
   actions,
 }: PokemonDetailScreenProps) {
   const artwork = pokemon.sprites.artwork ?? pokemon.sprites.default;
@@ -69,6 +72,37 @@ export function PokemonDetailScreen({
           <Text style={styles.statValue}>{pokemon.stats.total}</Text>
         </View>
       </View>
+
+      {battleHistory ? (
+        <View style={styles.history}>
+          <Text style={styles.statsHeading}>Battle history</Text>
+          {battleHistory.length === 0 ? (
+            <Text style={styles.historyEmpty}>No battles yet.</Text>
+          ) : (
+            battleHistory.map((battle) => (
+              <View key={battle.id} style={styles.historyRow}>
+                <View style={styles.historyCopy}>
+                  <Text style={styles.historyTitle}>
+                    Round {battle.round} · vs {battle.challengerName}
+                  </Text>
+                  <Text style={styles.historyMeta}>
+                    {battle.won ? "Win" : "Loss"}
+                    {battle.won ? ` · +$${battle.prizeMoney}` : ""}
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    styles.historyResult,
+                    battle.won ? styles.historyWin : styles.historyLoss,
+                  ]}
+                >
+                  {battle.won ? "W" : "L"}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+      ) : null}
 
       {actions ? <View style={styles.actions}>{actions}</View> : null}
     </ScrollView>
@@ -148,6 +182,46 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: "#1C1917",
+  },
+  history: {
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#E7E5E4",
+    backgroundColor: "#FFFCF7",
+    padding: 16,
+    gap: 12,
+  },
+  historyEmpty: {
+    fontSize: 15,
+    color: "#78716C",
+  },
+  historyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  historyCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  historyTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1C1917",
+  },
+  historyMeta: {
+    fontSize: 13,
+    color: "#78716C",
+  },
+  historyResult: {
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  historyWin: {
+    color: "#15803D",
+  },
+  historyLoss: {
+    color: "#B91C1C",
   },
   actions: {
     marginTop: 24,

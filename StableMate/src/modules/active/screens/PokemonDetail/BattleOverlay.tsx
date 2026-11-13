@@ -12,13 +12,13 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogSpecies } from "@/data/catalog.schema";
-import { prizeMoneyForWin } from "@/modules/active/screens/PokemonDetail/battle";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 
 type BattleOverlayProps = {
   player: PokemonInstance;
   challenger: CatalogSpecies;
   playerWins: boolean;
+  prizeMoney: number;
   onFinished: () => void;
 };
 
@@ -66,6 +66,7 @@ export function BattleOverlay({
   player,
   challenger,
   playerWins,
+  prizeMoney,
   onFinished,
 }: BattleOverlayProps) {
   const insets = useSafeAreaInsets();
@@ -85,7 +86,6 @@ export function BattleOverlay({
   const resultOpacity = useSharedValue(0);
 
   const winnerName = playerWins ? player.name : challenger.name;
-  const prizeMoney = playerWins ? prizeMoneyForWin(challenger) : 0;
 
   useEffect(() => {
     const hit1At = INTRO;

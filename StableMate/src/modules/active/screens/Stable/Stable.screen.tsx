@@ -1,13 +1,12 @@
 import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { STARTER_OPTIONS } from "@/constants/starters";
+import { getSpeciesBySlug } from "@/data/catalog";
 import { type OwnedPokemon, useGameStore } from "@/store/game";
 
 function StableRow({ item }: { item: OwnedPokemon }) {
-  const species = STARTER_OPTIONS.find(
-    (option) => option.id === item.speciesId,
-  );
+  const species = getSpeciesBySlug(item.speciesId);
+  const record = `${item.wins}W–${item.losses}L`;
 
   return (
     <Link
@@ -18,8 +17,15 @@ function StableRow({ item }: { item: OwnedPokemon }) {
       asChild
     >
       <Pressable style={styles.row}>
-        <Text style={styles.rowName}>{species?.name ?? item.speciesId}</Text>
-        <Text style={styles.rowType}>{species?.type ?? "—"}</Text>
+        <View style={styles.rowCopy}>
+          <Text style={styles.rowName}>
+            {species?.name ?? item.speciesId}
+          </Text>
+          <Text style={styles.rowMeta}>
+            {species?.types.join(" / ") ?? "—"} · {record}
+          </Text>
+        </View>
+        <Text style={styles.rowPrice}>${item.markPrice}</Text>
       </Pressable>
     </Link>
   );
@@ -75,6 +81,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E7E5E4",
     padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  rowCopy: {
+    flex: 1,
     gap: 4,
   },
   rowName: {
@@ -82,11 +94,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1C1917",
   },
-  rowType: {
+  rowMeta: {
     fontSize: 13,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
     color: "#78716C",
+    textTransform: "capitalize",
+  },
+  rowPrice: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1C1917",
   },
   separator: {
     height: 10,

@@ -51,9 +51,9 @@ export function pokemonFromOwned(owned: OwnedPokemon): PokemonInstance | null {
     types: species.types,
     sprites: species.sprites,
     stats: species.stats,
-    wins: 0,
-    losses: 0,
+    wins: owned.wins,
+    losses: owned.losses,
     listPrice: species.listPrice,
-    markPrice: species.listPrice,
+    markPrice: owned.markPrice,
   };
 }

@@ -1,10 +1,14 @@
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+
+import { useCash } from "@/store/game";
 
 export function CashDisplay() {
+  const cash = useCash();
+
   return (
     <View style={styles.card}>
       <Text style={styles.label}>Cash</Text>
-      <Text style={styles.value}>$0</Text>
+      <Text style={styles.value}>${cash}</Text>
     </View>
   );
 }
