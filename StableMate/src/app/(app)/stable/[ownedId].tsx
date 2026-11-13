@@ -1,17 +1,30 @@
 import { Stack, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import type { CatalogSpecies } from "@/data/catalog.schema";
 import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
 import { BattleAction } from "@/modules/active/screens/PokemonDetail/BattleAction";
+import { BattleOverlay } from "@/modules/active/screens/PokemonDetail/BattleOverlay";
+import {
+  pickChallenger,
+  rollPlayerWins,
+} from "@/modules/active/screens/PokemonDetail/battle";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromOwned } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { useGameStore } from "@/store/game";
+
+type BattleSession = {
+  challenger: CatalogSpecies;
+  playerWins: boolean;
+};
 
 export default function StableOwnedDetailRoute() {
   const { ownedId } = useLocalSearchParams<{ ownedId: string }>();
   const owned = useGameStore((store) =>
     store.state?.stable.find((item) => item.id === ownedId),
   );
+  const [battle, setBattle] = useState<BattleSession | null>(null);
 
   const pokemon = owned ? pokemonFromOwned(owned) : null;
 
@@ -32,7 +45,28 @@ export default function StableOwnedDetailRoute() {
   return (
     <>
       <Stack.Screen options={detailScreenHeaderOptions(pokemon.name)} />
-      <PokemonDetailScreen pokemon={pokemon} actions={<BattleAction />} />
+      <PokemonDetailScreen
+        pokemon={pokemon}
+        actions={
+          <BattleAction
+            disabled={battle !== null}
+            onPress={() => {
+              setBattle({
+                challenger: pickChallenger(pokemon.slug),
+                playerWins: rollPlayerWins(),
+              });
+            }}
+          />
+        }
+      />
+      {battle ? (
+        <BattleOverlay
+          player={pokemon}
+          challenger={battle.challenger}
+          playerWins={battle.playerWins}
+          onFinished={() => setBattle(null)}
+        />
+      ) : null}
     </>
   );
 }

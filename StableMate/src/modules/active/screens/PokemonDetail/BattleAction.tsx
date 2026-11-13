@@ -1,13 +1,21 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-export function BattleAction() {
+type BattleActionProps = {
+  onPress: () => void;
+  disabled?: boolean;
+};
+
+export function BattleAction({ onPress, disabled = false }: BattleActionProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => {
-        // Battle / end-round flow lands next.
-      }}
-      style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.button,
+        pressed && styles.buttonPressed,
+        disabled && styles.buttonDisabled,
+      ]}
     >
       <Text style={styles.buttonLabel}>Battle</Text>
     </Pressable>
@@ -22,6 +30,9 @@ const styles = StyleSheet.create({
   },
   buttonPressed: {
     opacity: 0.85,
+  },
+  buttonDisabled: {
+    opacity: 0.45,
   },
   buttonLabel: {
     color: "#FFFCF7",
