@@ -1,4 +1,5 @@
 import { getCatalogSpecies } from "@/data/catalog";
+import { markPriceFromRecord } from "@/lib/pricing";
 
 export type MarketListing = {
   id: string;
@@ -31,16 +32,6 @@ function rollRecord() {
   const wins = Math.floor(Math.random() * 6);
   const losses = Math.floor(Math.random() * 6);
   return { wins, losses };
-}
-
-function markPriceFromRecord(
-  listPrice: number,
-  wins: number,
-  losses: number,
-): number {
-  const delta = wins - losses;
-  const multiplier = 1 + delta * 0.06;
-  return Math.max(25, Math.round(listPrice * multiplier));
 }
 
 /** Generates this round's market lot. RQ caches by round so results stay stable. */
