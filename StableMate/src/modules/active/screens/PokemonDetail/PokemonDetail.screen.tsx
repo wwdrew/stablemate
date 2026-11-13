@@ -75,9 +75,15 @@ export function PokemonDetailScreen({
 
       {battleHistory ? (
         <View style={styles.history}>
-          <Text style={styles.statsHeading}>Battle history</Text>
+          <Text style={styles.statsHeading}>Your battle history</Text>
+          <Text style={styles.historyHint}>
+            Record above can include form from before you owned them. This list
+            is only battles you’ve fought.
+          </Text>
           {battleHistory.length === 0 ? (
-            <Text style={styles.historyEmpty}>No battles yet.</Text>
+            <Text style={styles.historyEmpty}>
+              No battles under your ownership yet.
+            </Text>
           ) : (
             battleHistory.map((battle) => (
               <View key={battle.id} style={styles.historyRow}>
@@ -190,6 +196,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFCF7",
     padding: 16,
     gap: 12,
+  },
+  historyHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: "#78716C",
+    marginTop: -4,
   },
   historyEmpty: {
     fontSize: 15,

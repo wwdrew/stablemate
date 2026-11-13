@@ -28,7 +28,9 @@ export function OverviewScreen() {
       style={styles.screen}
       contentContainerStyle={styles.content}
     >
-      <Text style={styles.subtitle}>Your stable at a glance.</Text>
+      <Text style={styles.subtitle}>
+        Wallet and stable at a glance. Cash movements live in History.
+      </Text>
 
       <View style={styles.row}>
         <CashDisplay />

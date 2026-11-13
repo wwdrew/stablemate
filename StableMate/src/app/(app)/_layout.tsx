@@ -11,6 +11,14 @@ export default function AppTabsLayout() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="history">
+        <NativeTabs.Trigger.Label>History</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "list.bullet.rectangle", selected: "list.bullet.rectangle.fill" }}
+          md={{ default: "receipt_long", selected: "receipt_long" }}
+        />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="stable">
         <NativeTabs.Trigger.Label>Stable</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
