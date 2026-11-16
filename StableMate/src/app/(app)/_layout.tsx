@@ -1,6 +1,10 @@
 import { NativeTabs } from "expo-router/native-tabs";
 
+import { useSettlementQueue } from "@/api/useSettlementQueue";
+
 export default function AppTabsLayout() {
+  useSettlementQueue();
+
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">

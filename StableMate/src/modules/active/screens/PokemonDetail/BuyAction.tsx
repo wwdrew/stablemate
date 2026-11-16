@@ -4,6 +4,7 @@ type BuyActionProps = {
   price: number;
   disabled?: boolean;
   statusMessage?: string | null;
+  statusTone?: "error" | "info";
   onPress: () => void;
 };
 
@@ -11,12 +12,15 @@ export function BuyAction({
   price,
   disabled = false,
   statusMessage = null,
+  statusTone = "error",
   onPress,
 }: BuyActionProps) {
   return (
     <View style={styles.wrap}>
       {statusMessage ? (
-        <Text style={styles.status}>{statusMessage}</Text>
+        <Text
+          style={[styles.status, statusTone === "info" && styles.statusInfo]}
+        >{statusMessage}</Text>
       ) : null}
       <Pressable
         accessibilityRole="button"
@@ -42,6 +46,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#B91C1C",
     textAlign: "center",
+  },
+  statusInfo: {
+    color: "#57534E",
   },
   button: {
     backgroundColor: "#1C1917",

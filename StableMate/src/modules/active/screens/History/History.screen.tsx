@@ -1,57 +1,52 @@
 import { LegendList } from "@legendapp/list/react-native";
+import { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { formatAmount, statusLabel, typeLabel } from "@/lib/ledger";
 import {
   type LedgerEntry,
-  type LedgerEntryType,
   useCash,
   useLedger,
+  usePendingCredits,
 } from "@/store/game";
-
-function formatAmount(amount: number): string {
-  const absolute = Math.abs(amount);
-  if (amount > 0) {
-    return `+$${absolute}`;
-  }
-  if (amount < 0) {
-    return `-$${absolute}`;
-  }
-  return "$0";
-}
-
-function typeLabel(type: LedgerEntryType): string {
-  switch (type) {
-    case "purchase":
-      return "Purchase";
-    case "prize":
-      return "Prize";
-    case "sale":
-      return "Sale";
-    default: {
-      const _exhaustive: never = type;
-      return _exhaustive;
-    }
-  }
-}
 
 function TransactionRow({ item }: { item: LedgerEntry }) {
   const positive = item.amount > 0;
+  const status = statusLabel(item.status);
 
   return (
-    <View style={styles.row}>
-      <View style={styles.rowCopy}>
-        <Text style={styles.rowType}>{typeLabel(item.type)}</Text>
-        <Text style={styles.rowTitle}>{item.title}</Text>
-        <Text style={styles.rowSubtitle}>{item.subtitle}</Text>
-      </View>
-      <View style={styles.amounts}>
-        <Text
-          style={[styles.amount, positive ? styles.amountIn : styles.amountOut]}
-        >
-          {formatAmount(item.amount)}
-        </Text>
-        <Text style={styles.balance}>Bal ${item.balanceAfter}</Text>
-      </View>
+    <View style={[styles.row, item.status === "pending" && styles.rowPending]}>
+        <View style={styles.rowCopy}>
+          <Text style={styles.rowType}>
+            {typeLabel(item.type)}
+            {status ? (
+              <Text
+                style={
+                  item.status === "pending" ? styles.statusPending : styles.statusFailed
+                }
+              >
+                {` · ${status}`}
+              </Text>
+            ) : null}
+          </Text>
+          <Text style={styles.rowTitle}>{item.title}</Text>
+          <Text style={styles.rowSubtitle}>{item.subtitle}</Text>
+        </View>
+        <View style={styles.amounts}>
+          <Text
+            style={[
+              styles.amount,
+              positive ? styles.amountIn : styles.amountOut,
+              item.status === "pending" && styles.amountPending,
+              item.status === "failed" && styles.amountFailed,
+            ]}
+          >
+            {formatAmount(item.amount)}
+          </Text>
+          {item.balanceAfter !== null ? (
+            <Text style={styles.balance}>Bal ${item.balanceAfter}</Text>
+          ) : null}
+        </View>
     </View>
   );
 }
@@ -59,10 +54,20 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
 export function HistoryScreen() {
   const ledger = useLedger();
   const cash = useCash();
+  const pendingCredits = usePendingCredits();
+
+  // Pending first (like a bank app), then posted activity newest-first.
+  const entries = useMemo(
+    () => [
+      ...ledger.filter((entry) => entry.status === "pending"),
+      ...ledger.filter((entry) => entry.status !== "pending"),
+    ],
+    [ledger],
+  );
 
   return (
     <LegendList
-      data={ledger}
+      data={entries}
       keyExtractor={(item) => item.id}
       recycleItems
       contentInsetAdjustmentBehavior="automatic"
@@ -71,12 +76,17 @@ export function HistoryScreen() {
       ListHeaderComponent={
         <View style={styles.header}>
           <Text style={styles.subtitle}>
-            Money in and out of your wallet. Every purchase and prize lands
-            here.
+            Money in and out of your wallet. Every purchase, sale and prize
+            lands here.
           </Text>
           <View style={styles.balanceCard}>
             <Text style={styles.balanceLabel}>Current balance</Text>
             <Text style={styles.balanceValue}>${cash}</Text>
+            {pendingCredits > 0 ? (
+              <Text style={styles.balancePending}>
+                +${pendingCredits} pending from sales
+              </Text>
+            ) : null}
             <Text style={styles.balanceMeta}>
               {ledger.length === 1
                 ? "1 transaction"
@@ -89,7 +99,7 @@ export function HistoryScreen() {
         <View style={styles.empty}>
           <Text style={styles.emptyTitle}>No transactions yet</Text>
           <Text style={styles.emptyBody}>
-            Win battle prizes or buy from the market — each cash movement shows
+            Win battle prizes or trade on the market — each cash movement shows
             up in this ledger.
           </Text>
         </View>
@@ -136,6 +146,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1C1917",
   },
+  balancePending: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#B45309",
+  },
   balanceMeta: {
     fontSize: 13,
     color: "#78716C",
@@ -148,6 +163,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
+  },
+  rowPending: {
+    borderStyle: "dashed",
+    borderColor: "#A8A29E",
+  },
+  statusPending: {
+    color: "#B45309",
+  },
+  statusFailed: {
+    color: "#B91C1C",
   },
   rowCopy: {
     flex: 1,
@@ -182,6 +207,13 @@ const styles = StyleSheet.create({
   },
   amountOut: {
     color: "#1C1917",
+  },
+  amountPending: {
+    color: "#A8A29E",
+  },
+  amountFailed: {
+    color: "#A8A29E",
+    textDecorationLine: "line-through",
   },
   balance: {
     fontSize: 12,

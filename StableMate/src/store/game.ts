@@ -1,24 +1,47 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import {
+  type SettlementFailureReason,
+  type SettlementResult,
+  settlementFailureMessage,
+} from "@/api/settlement";
 import { getSpeciesBySlug } from "@/data/catalog";
 import { markPriceFromRecord } from "@/lib/pricing";
 import { mmkvStorage } from "@/store/mmkv";
 
 export type StarterId = "bulbasaur" | "charmander" | "squirtle";
 
-export type LedgerEntryType = "purchase" | "prize" | "sale";
+export type LedgerEntryType = "purchase" | "prize" | "sale" | "refund";
+
+/**
+ * Purchases debit cash immediately (a hold) and sit `pending` until settled;
+ * a failed purchase is reversed by a separate `refund` entry. Sales credit
+ * nothing until they settle, so pending proceeds can't be spent.
+ */
+export type TransactionStatus = "pending" | "settled" | "failed";
 
 export type LedgerEntry = {
   id: string;
   type: LedgerEntryType;
-  /** Signed cash delta: purchases negative, prizes/sales positive. */
+  status: TransactionStatus;
+  /** Signed cash delta: purchases negative, prizes/sales/refunds positive. */
   amount: number;
-  balanceAfter: number;
+  /** Cash after this entry posted; `null` for sales that haven't credited. */
+  balanceAfter: number | null;
   title: string;
   subtitle: string;
   round: number;
   createdAt: string;
+  settledAt: string | null;
+  failureReason: SettlementFailureReason | null;
+  /** Owned Pokémon moved by this purchase or sale. */
+  ownedId: string | null;
+};
+
+export type PendingTransaction = {
+  txnId: string;
+  type: "purchase" | "sale";
 };
 
 export type BattleRecord = {
@@ -42,6 +65,8 @@ export type OwnedPokemon = {
   wins: number;
   losses: number;
   markPrice: number;
+  /** Set while a purchase or sale of this Pokémon is awaiting settlement. */
+  pending: PendingTransaction | null;
 };
 
 export type GameState = {
@@ -79,12 +104,21 @@ export type PurchaseResult =
       reason: "no_state" | "insufficient_funds" | "already_purchased";
     };
 
+export type SellResult =
+  | { ok: true; txnId: string }
+  | {
+      ok: false;
+      reason: "no_state" | "not_found" | "pending" | "last_pokemon";
+    };
+
 type GameStore = {
   state: GameState | null;
   createState: (starterId: StarterId) => void;
   clearState: () => void;
   resolveBattle: (input: ResolveBattleInput) => void;
   purchaseListing: (input: PurchaseListingInput) => PurchaseResult;
+  sellOwned: (ownedId: string) => SellResult;
+  applySettlement: (txnId: string, result: SettlementResult) => void;
 };
 
 function createOwnedStarter(starterId: StarterId): OwnedPokemon {
@@ -97,6 +131,7 @@ function createOwnedStarter(starterId: StarterId): OwnedPokemon {
     wins: 0,
     losses: 0,
     markPrice: listPrice,
+    pending: null,
   };
 }
 
@@ -115,22 +150,62 @@ function migrateOwnedPokemon(
     losses,
     markPrice:
       owned.markPrice ?? markPriceFromRecord(listPrice, wins, losses),
+    pending: owned.pending ?? null,
   };
 }
 
-function createLedgerEntry(
-  partial: Omit<LedgerEntry, "id" | "createdAt"> & { id?: string },
+function migrateLedgerEntry(
+  entry: Partial<LedgerEntry> &
+    Omit<LedgerEntry, "status" | "settledAt" | "failureReason" | "ownedId">,
 ): LedgerEntry {
+  return {
+    ...entry,
+    status: entry.status ?? "settled",
+    settledAt: entry.settledAt ?? entry.createdAt,
+    failureReason: entry.failureReason ?? null,
+    ownedId: entry.ownedId ?? null,
+  };
+}
+
+function speciesName(owned: OwnedPokemon | undefined): string {
+  return getSpeciesBySlug(owned?.speciesId ?? "")?.name ?? "Pokémon";
+}
+
+function createLedgerEntry(
+  partial: Pick<
+    LedgerEntry,
+    "type" | "amount" | "balanceAfter" | "title" | "subtitle" | "round"
+  > &
+    Partial<Pick<LedgerEntry, "id" | "status" | "ownedId">>,
+): LedgerEntry {
+  const createdAt = new Date().toISOString();
+  const status = partial.status ?? "settled";
+
   return {
     id: partial.id ?? `txn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     type: partial.type,
+    status,
     amount: partial.amount,
     balanceAfter: partial.balanceAfter,
     title: partial.title,
     subtitle: partial.subtitle,
     round: partial.round,
-    createdAt: new Date().toISOString(),
+    createdAt,
+    settledAt: status === "settled" ? createdAt : null,
+    failureReason: null,
+    ownedId: partial.ownedId ?? null,
   };
+}
+
+function oldestPendingId(ledger: LedgerEntry[]): string | null {
+  // Ledger is newest-first, so the queue head is the last pending entry.
+  for (let index = ledger.length - 1; index >= 0; index -= 1) {
+    const entry = ledger[index]!;
+    if (entry.status === "pending") {
+      return entry.id;
+    }
+  }
+  return null;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -171,8 +246,11 @@ export const useGameStore = create<GameStore>()(
           const cash = store.state.cash + awarded;
 
           const fighter = store.state.stable.find((owned) => owned.id === ownedId);
-          const fighterName =
-            getSpeciesBySlug(fighter?.speciesId ?? "")?.name ?? "Pokémon";
+          if (!fighter || fighter.pending) {
+            return store;
+          }
+
+          const fighterName = speciesName(fighter);
 
           const stable = store.state.stable.map((owned) => {
             if (owned.id !== ownedId) {
@@ -213,6 +291,7 @@ export const useGameStore = create<GameStore>()(
                     title: "Battle prize",
                     subtitle: `${fighterName} beat ${challengerName}`,
                     round: roundsPlayed,
+                    ownedId,
                   }),
                   ...store.state.ledger,
                 ]
@@ -259,11 +338,13 @@ export const useGameStore = create<GameStore>()(
         const cash = store.state.cash - markPrice;
         const entry = createLedgerEntry({
           type: "purchase",
+          status: "pending",
           amount: -markPrice,
           balanceAfter: cash,
           title: `Bought ${name}`,
           subtitle: `Market lot · Round ${store.state.roundsPlayed}`,
           round: store.state.roundsPlayed,
+          ownedId,
         });
 
         set({
@@ -280,6 +361,7 @@ export const useGameStore = create<GameStore>()(
                 wins,
                 losses,
                 markPrice,
+                pending: { txnId: entry.id, type: "purchase" },
               },
             ],
           },
@@ -287,6 +369,140 @@ export const useGameStore = create<GameStore>()(
 
         return { ok: true, ownedId };
       },
+      sellOwned: (ownedId) => {
+        const state = get().state;
+        if (!state) {
+          return { ok: false, reason: "no_state" };
+        }
+
+        const owned = state.stable.find((item) => item.id === ownedId);
+        if (!owned) {
+          return { ok: false, reason: "not_found" };
+        }
+
+        if (owned.pending) {
+          return { ok: false, reason: "pending" };
+        }
+
+        // Selling the last Pokémon would leave nothing to battle with.
+        const keeping = state.stable.filter(
+          (item) => item.id !== ownedId && item.pending?.type !== "sale",
+        );
+        if (keeping.length === 0) {
+          return { ok: false, reason: "last_pokemon" };
+        }
+
+        const entry = createLedgerEntry({
+          type: "sale",
+          status: "pending",
+          amount: owned.markPrice,
+          balanceAfter: null,
+          title: `Sold ${speciesName(owned)}`,
+          subtitle: `Market sale · Round ${state.roundsPlayed}`,
+          round: state.roundsPlayed,
+          ownedId,
+        });
+
+        set({
+          state: {
+            ...state,
+            ledger: [entry, ...state.ledger],
+            stable: state.stable.map((item) =>
+              item.id === ownedId
+                ? { ...item, pending: { txnId: entry.id, type: "sale" } }
+                : item,
+            ),
+          },
+        });
+
+        return { ok: true, txnId: entry.id };
+      },
+      applySettlement: (txnId, result) =>
+        set((store) => {
+          const state = store.state;
+          const entry = state?.ledger.find((item) => item.id === txnId);
+          if (!state || !entry || entry.status !== "pending") {
+            return store;
+          }
+
+          const settledAt = new Date().toISOString();
+          const owned = state.stable.find((item) => item.id === entry.ownedId);
+          const otherEntries = state.ledger.filter((item) => item.id !== txnId);
+          const failed: LedgerEntry = {
+            ...entry,
+            status: "failed",
+            settledAt,
+            failureReason: result.ok ? null : result.reason,
+          };
+
+          if (entry.type === "purchase") {
+            if (result.ok) {
+              return {
+                state: {
+                  ...state,
+                  ledger: state.ledger.map((item) =>
+                    item.id === txnId
+                      ? { ...item, status: "settled", settledAt }
+                      : item,
+                  ),
+                  stable: state.stable.map((item) =>
+                    item.id === entry.ownedId ? { ...item, pending: null } : item,
+                  ),
+                },
+              };
+            }
+
+            // Release the hold with a compensating entry; history stays append-only.
+            const cash = state.cash - entry.amount;
+            const refund = createLedgerEntry({
+              type: "refund",
+              amount: -entry.amount,
+              balanceAfter: cash,
+              title: `Refund · ${speciesName(owned)}`,
+              subtitle: settlementFailureMessage(failed.failureReason!),
+              round: state.roundsPlayed,
+              ownedId: entry.ownedId,
+            });
+
+            return {
+              state: {
+                ...state,
+                cash,
+                ledger: [
+                  refund,
+                  ...state.ledger.map((item) => (item.id === txnId ? failed : item)),
+                ],
+                stable: state.stable.filter((item) => item.id !== entry.ownedId),
+              },
+            };
+          }
+
+          if (result.ok) {
+            // Sale proceeds post now, so the entry moves to the top of the ledger.
+            const cash = state.cash + entry.amount;
+            return {
+              state: {
+                ...state,
+                cash,
+                ledger: [
+                  { ...entry, status: "settled", settledAt, balanceAfter: cash },
+                  ...otherEntries,
+                ],
+                stable: state.stable.filter((item) => item.id !== entry.ownedId),
+              },
+            };
+          }
+
+          return {
+            state: {
+              ...state,
+              ledger: state.ledger.map((item) => (item.id === txnId ? failed : item)),
+              stable: state.stable.map((item) =>
+                item.id === entry.ownedId ? { ...item, pending: null } : item,
+              ),
+            },
+          };
+        }),
     }),
     {
       name: "stablemate-game",
@@ -313,7 +529,9 @@ export const useGameStore = create<GameStore>()(
             roundsPlayed: state.roundsPlayed ?? 0,
             cash,
             cashHistory: state.cashHistory ?? [{ round: 0, cash }],
-            ledger: state.ledger ?? [],
+            ledger: (state.ledger ?? []).map((entry) =>
+              migrateLedgerEntry(entry),
+            ),
             battleHistory: state.battleHistory ?? [],
             purchasedListingIds: state.purchasedListingIds ?? [],
             stable: (state.stable ?? [createOwnedStarter(starterId)]).map(
@@ -334,5 +552,21 @@ export const useRoundsPlayed = () =>
 
 export const useCash = () => useGameStore((store) => store.state?.cash ?? 0);
 
+const EMPTY_LEDGER: LedgerEntry[] = [];
+
 export const useLedger = () =>
-  useGameStore((store) => store.state?.ledger ?? []);
+  useGameStore((store) => store.state?.ledger ?? EMPTY_LEDGER);
+
+/** Oldest pending transaction — the head of the settlement queue. */
+export const useNextPendingTransactionId = () =>
+  useGameStore((store) =>
+    store.state ? oldestPendingId(store.state.ledger) : null,
+  );
+
+/** Sale proceeds awaiting settlement — not yet spendable. */
+export const usePendingCredits = () =>
+  useGameStore((store) =>
+    (store.state?.ledger ?? EMPTY_LEDGER)
+      .filter((entry) => entry.status === "pending" && entry.type === "sale")
+      .reduce((sum, entry) => sum + entry.amount, 0),
+  );

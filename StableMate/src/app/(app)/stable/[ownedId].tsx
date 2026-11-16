@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -13,8 +13,9 @@ import {
 } from "@/modules/active/screens/PokemonDetail/battle";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromOwned } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
-import { useGameStore } from "@/store/game";
-import { useBattleOutcome } from "@/store/settings";
+import { SellAction } from "@/modules/active/screens/PokemonDetail/SellAction";
+import { type OwnedPokemon, useGameStore } from "@/store/game";
+import { useBattleOutcome, useIsOnline } from "@/store/settings";
 
 type BattleSession = {
   challenger: CatalogSpecies;
@@ -22,14 +23,46 @@ type BattleSession = {
   prizeMoney: number;
 };
 
+function ownedStatusMessage(args: {
+  owned: OwnedPokemon;
+  isOnline: boolean;
+  isLastPokemon: boolean;
+}): string | null {
+  const settles = args.isOnline
+    ? "Settling now…"
+    : "Settles when you’re back online.";
+
+  if (args.owned.pending?.type === "purchase") {
+    return `Purchase pending. ${settles}`;
+  }
+
+  if (args.owned.pending?.type === "sale") {
+    return `Sale pending at $${args.owned.markPrice}. ${settles}`;
+  }
+
+  if (args.isLastPokemon) {
+    return "You can’t sell your last Pokémon.";
+  }
+
+  return null;
+}
+
 export default function StableOwnedDetailRoute() {
+  const router = useRouter();
   const { ownedId } = useLocalSearchParams<{ ownedId: string }>();
   const owned = useGameStore((store) =>
     store.state?.stable.find((item) => item.id === ownedId),
   );
   const battleHistory = useGameStore((store) => store.state?.battleHistory ?? []);
   const resolveBattle = useGameStore((store) => store.resolveBattle);
+  const sellOwned = useGameStore((store) => store.sellOwned);
+  const keepingCount = useGameStore(
+    (store) =>
+      store.state?.stable.filter((item) => item.pending?.type !== "sale")
+        .length ?? 0,
+  );
   const battleOutcome = useBattleOutcome();
+  const isOnline = useIsOnline();
   const [battle, setBattle] = useState<BattleSession | null>(null);
 
   const pokemon = owned ? pokemonFromOwned(owned) : null;
@@ -38,7 +71,7 @@ export default function StableOwnedDetailRoute() {
     [battleHistory, ownedId],
   );
 
-  if (!pokemon) {
+  if (!pokemon || !owned) {
     return (
       <>
         <Stack.Screen options={detailScreenHeaderOptions("Not found")} />
@@ -52,6 +85,10 @@ export default function StableOwnedDetailRoute() {
     );
   }
 
+  const isPending = owned.pending !== null;
+  const isLastPokemon = !isPending && keepingCount <= 1;
+  const statusMessage = ownedStatusMessage({ owned, isOnline, isLastPokemon });
+
   return (
     <>
       <Stack.Screen options={detailScreenHeaderOptions(pokemon.name)} />
@@ -59,18 +96,31 @@ export default function StableOwnedDetailRoute() {
         pokemon={pokemon}
         battleHistory={ownedBattleHistory}
         actions={
-          <BattleAction
-            disabled={battle !== null}
-            onPress={() => {
-              const challenger = pickChallenger(pokemon.slug);
-              const playerWins = rollPlayerWins(battleOutcome);
-              setBattle({
-                challenger,
-                playerWins,
-                prizeMoney: playerWins ? prizeMoneyForWin(challenger) : 0,
-              });
-            }}
-          />
+          <View style={styles.actions}>
+            <BattleAction
+              disabled={battle !== null || isPending}
+              onPress={() => {
+                const challenger = pickChallenger(pokemon.slug);
+                const playerWins = rollPlayerWins(battleOutcome);
+                setBattle({
+                  challenger,
+                  playerWins,
+                  prizeMoney: playerWins ? prizeMoneyForWin(challenger) : 0,
+                });
+              }}
+            />
+            <SellAction
+              price={owned.markPrice}
+              disabled={battle !== null || isPending || isLastPokemon}
+              statusMessage={statusMessage}
+              onPress={() => {
+                const result = sellOwned(owned.id);
+                if (result.ok && router.canGoBack()) {
+                  router.back();
+                }
+              }}
+            />
+          </View>
         }
       />
       {battle ? (
@@ -96,6 +146,9 @@ export default function StableOwnedDetailRoute() {
 }
 
 const styles = StyleSheet.create({
+  actions: {
+    gap: 12,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",

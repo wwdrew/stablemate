@@ -4,16 +4,63 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameStore } from "@/store/game";
 import {
   type BattleOutcome,
+  type SettlementOutcome,
   useBattleOutcome,
   useIsOnline,
   useSettingsStore,
+  useSettlementOutcome,
 } from "@/store/settings";
 
-const BATTLE_OUTCOME_OPTIONS: { value: BattleOutcome; label: string }[] = [
+type SegmentOption<T extends string> = { value: T; label: string };
+
+const BATTLE_OUTCOME_OPTIONS: SegmentOption<BattleOutcome>[] = [
   { value: "random", label: "Random" },
   { value: "win", label: "Always win" },
   { value: "lose", label: "Always lose" },
 ];
+
+const SETTLEMENT_OUTCOME_OPTIONS: SegmentOption<SettlementOutcome>[] = [
+  { value: "random", label: "Random" },
+  { value: "succeed", label: "Always settle" },
+  { value: "fail", label: "Always fail" },
+];
+
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: SegmentOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <View style={styles.segmented}>
+      {options.map((option) => {
+        const selected = value === option.value;
+
+        return (
+          <Pressable
+            key={option.value}
+            accessibilityRole="button"
+            accessibilityState={{ selected }}
+            onPress={() => onChange(option.value)}
+            style={[styles.segment, selected && styles.segmentSelected]}
+          >
+            <Text
+              style={[
+                styles.segmentLabel,
+                selected && styles.segmentLabelSelected,
+              ]}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
 
 export function OptionsScreen() {
   const insets = useSafeAreaInsets();
@@ -21,6 +68,10 @@ export function OptionsScreen() {
   const setIsOnline = useSettingsStore((store) => store.setIsOnline);
   const battleOutcome = useBattleOutcome();
   const setBattleOutcome = useSettingsStore((store) => store.setBattleOutcome);
+  const settlementOutcome = useSettlementOutcome();
+  const setSettlementOutcome = useSettingsStore(
+    (store) => store.setSettlementOutcome,
+  );
   const clearState = useGameStore((store) => store.clearState);
 
   return (
@@ -33,8 +84,8 @@ export function OptionsScreen() {
           <Text style={styles.rowTitle}>Simulate network</Text>
           <Text style={styles.rowBody}>
             {isOnline
-              ? "Online — buys settle immediately."
-              : "Offline — buys queue until you go online."}
+              ? "Online — buys and sales settle in a moment."
+              : "Offline — buys and sales queue until you go online."}
           </Text>
         </View>
         <Switch
@@ -47,30 +98,20 @@ export function OptionsScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Battle outcome</Text>
-        <View style={styles.segmented}>
-          {BATTLE_OUTCOME_OPTIONS.map((option) => {
-            const selected = battleOutcome === option.value;
+        <SegmentedControl
+          options={BATTLE_OUTCOME_OPTIONS}
+          value={battleOutcome}
+          onChange={setBattleOutcome}
+        />
+      </View>
 
-            return (
-              <Pressable
-                key={option.value}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                onPress={() => setBattleOutcome(option.value)}
-                style={[styles.segment, selected && styles.segmentSelected]}
-              >
-                <Text
-                  style={[
-                    styles.segmentLabel,
-                    selected && styles.segmentLabelSelected,
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Settlement outcome</Text>
+        <SegmentedControl
+          options={SETTLEMENT_OUTCOME_OPTIONS}
+          value={settlementOutcome}
+          onChange={setSettlementOutcome}
+        />
       </View>
 
       <View style={styles.section}>

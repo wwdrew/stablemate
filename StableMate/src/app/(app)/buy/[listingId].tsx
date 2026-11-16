@@ -38,17 +38,26 @@ function purchaseStatusMessage(args: {
   cash: number;
   price: number;
   failureReason: "insufficient_funds" | "already_purchased" | "no_state" | null;
-}): string | null {
-  if (!args.isOnline) {
-    return "You’re offline — connect to buy.";
-  }
-
+}): { text: string; tone: "error" | "info" } | null {
   if (args.failureReason) {
-    return failureReasonMessage(args.failureReason, args.cash, args.price);
+    return {
+      text: failureReasonMessage(args.failureReason, args.cash, args.price),
+      tone: "error",
+    };
   }
 
   if (args.cash < args.price) {
-    return failureReasonMessage("insufficient_funds", args.cash, args.price);
+    return {
+      text: failureReasonMessage("insufficient_funds", args.cash, args.price),
+      tone: "error",
+    };
+  }
+
+  if (!args.isOnline) {
+    return {
+      text: "You’re offline — funds are held now and the purchase settles when you reconnect.",
+      tone: "info",
+    };
   }
 
   return null;
@@ -99,7 +108,7 @@ export default function BuyListingDetailRoute() {
     price: listing.markPrice,
     failureReason,
   });
-  const canBuy = isOnline && cash >= listing.markPrice && failureReason !== "already_purchased";
+  const canBuy = cash >= listing.markPrice && failureReason !== "already_purchased";
 
   return (
     <>
@@ -110,7 +119,8 @@ export default function BuyListingDetailRoute() {
           <BuyAction
             price={listing.markPrice}
             disabled={!canBuy}
-            statusMessage={statusMessage}
+            statusMessage={statusMessage?.text}
+            statusTone={statusMessage?.tone}
             onPress={() => {
               const result = purchaseListing({
                 listingId: listing.id,

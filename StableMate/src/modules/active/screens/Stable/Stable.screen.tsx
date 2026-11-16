@@ -7,6 +7,12 @@ import { type OwnedPokemon, useGameStore } from "@/store/game";
 function StableRow({ item }: { item: OwnedPokemon }) {
   const species = getSpeciesBySlug(item.speciesId);
   const record = `${item.wins}W–${item.losses}L`;
+  const pendingLabel =
+    item.pending?.type === "sale"
+      ? "Selling · pending"
+      : item.pending?.type === "purchase"
+        ? "Buying · pending"
+        : null;
 
   return (
     <Link
@@ -16,7 +22,9 @@ function StableRow({ item }: { item: OwnedPokemon }) {
       }}
       asChild
     >
-      <Pressable style={styles.row}>
+      <Pressable
+        style={StyleSheet.flatten([styles.row, pendingLabel && styles.rowPending])}
+      >
         <View style={styles.rowCopy}>
           <Text style={styles.rowName}>
             {species?.name ?? item.speciesId}
@@ -24,6 +32,9 @@ function StableRow({ item }: { item: OwnedPokemon }) {
           <Text style={styles.rowMeta}>
             {species?.types.join(" / ") ?? "—"} · {record}
           </Text>
+          {pendingLabel ? (
+            <Text style={styles.rowPendingLabel}>{pendingLabel}</Text>
+          ) : null}
         </View>
         <Text style={styles.rowPrice}>${item.markPrice}</Text>
       </Pressable>
@@ -84,6 +95,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+  },
+  rowPending: {
+    borderStyle: "dashed",
+    borderColor: "#A8A29E",
+  },
+  rowPendingLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+    color: "#B45309",
   },
   rowCopy: {
     flex: 1,
