@@ -1,22 +1,16 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
-import { useGameStore } from "@/store/game";
+import { useGameStore, useNetWorth, usePendingCredits } from "@/store/game";
 
+import { CashChart } from "./CashChart";
 import { CashDisplay } from "./CashDisplay";
 import { RoundsDisplay } from "./RoundsDisplay";
 
-/**
- * FUTURE — cash-over-time chart on Overview
- * - Height ≈ 50% of screen width
- * - Horizontal baseline through the vertical centre (black)
- * - Line chart of cash after each round (x = round, y = cash)
- * - Segment / stroke green while cash ≥ 0, red while cash < 0
- * - Needs round-by-round cash history in game state before this can ship
- */
-
 export function OverviewScreen() {
   const state = useGameStore((store) => store.state);
+  const netWorth = useNetWorth();
+  const pendingCredits = usePendingCredits();
 
   const starter = STARTER_OPTIONS.find(
     (option) => option.id === state?.starterId,
@@ -36,6 +30,17 @@ export function OverviewScreen() {
         <CashDisplay />
         <RoundsDisplay />
       </View>
+
+      <View style={styles.card}>
+        <Text style={styles.label}>Net worth</Text>
+        <Text style={styles.value}>${netWorth}</Text>
+        <Text style={styles.meta}>
+          Cash + stable at mark price
+          {pendingCredits > 0 ? ` · +$${pendingCredits} sales pending` : ""}
+        </Text>
+      </View>
+
+      <CashChart />
 
       <View style={styles.card}>
         <Text style={styles.label}>Starter</Text>

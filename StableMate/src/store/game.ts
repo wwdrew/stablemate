@@ -553,6 +553,10 @@ export const useRoundsPlayed = () =>
 export const useCash = () => useGameStore((store) => store.state?.cash ?? 0);
 
 const EMPTY_LEDGER: LedgerEntry[] = [];
+const EMPTY_CASH_HISTORY: CashHistoryEntry[] = [];
+
+export const useCashHistory = () =>
+  useGameStore((store) => store.state?.cashHistory ?? EMPTY_CASH_HISTORY);
 
 export const useLedger = () =>
   useGameStore((store) => store.state?.ledger ?? EMPTY_LEDGER);
@@ -569,4 +573,15 @@ export const usePendingCredits = () =>
     (store.state?.ledger ?? EMPTY_LEDGER)
       .filter((entry) => entry.status === "pending" && entry.type === "sale")
       .reduce((sum, entry) => sum + entry.amount, 0),
+  );
+
+/** Cash + Σ mark price. Pending sales stay in the stable at their locked price until they clear. */
+export const useNetWorth = () =>
+  useGameStore((store) =>
+    store.state
+      ? store.state.stable.reduce(
+          (sum, owned) => sum + owned.markPrice,
+          store.state.cash,
+        )
+      : 0,
   );
