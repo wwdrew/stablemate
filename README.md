@@ -61,6 +61,7 @@ flowchart LR
 ```bash
 cd StableMate
 npm test        # full suite, a few seconds
+npm run lint    # ESLint: Expo config, including React Compiler rules
 npx tsc --noEmit
 ```
 

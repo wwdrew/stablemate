@@ -1,4 +1,4 @@
-import { useGameStore, useRoundsPlayed } from "@/store/game";
+import { useRoundsPlayed } from "@/store/game";
 import { View, Text, StyleSheet } from "react-native";
 
 export function RoundsDisplay() {
