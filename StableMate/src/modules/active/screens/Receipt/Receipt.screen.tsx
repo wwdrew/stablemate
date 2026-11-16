@@ -46,9 +46,9 @@ export function ReceiptScreen({ entry }: ReceiptScreenProps) {
       : []),
     { label: "Balance after", value: balanceCopy(entry) },
     { label: "Round", value: String(entry.round) },
-    { label: "Created", value: formatTimestamp(entry.createdAt) },
+    { label: "Created at", value: formatTimestamp(entry.createdAt) },
     {
-      label: entry.status === "failed" ? "Failed" : "Settled",
+      label: entry.status === "failed" ? "Failed at" : "Settled at",
       value: formatTimestamp(entry.settledAt),
     },
     { label: "Reference", value: entry.id },
