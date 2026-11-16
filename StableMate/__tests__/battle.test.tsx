@@ -1,7 +1,7 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
-import * as battle from "@/modules/active/screens/PokemonDetail/battle";
+import * as battle from "@/lib/battle";
 import { useGameStore } from "@/store/game";
 import { useSettingsStore } from "@/store/settings";
 
@@ -78,4 +78,16 @@ test("B2 · a loss pays nothing and records the loss", async () => {
   expect(overview.getByText("$0")).toBeOnTheScreen();
   expect(overview.getByText("$407")).toBeOnTheScreen();
   expect(withinTab("history").getByText("No transactions yet")).toBeOnTheScreen();
+});
+
+test("B7 · the result is committed when the battle starts, not on Continue", async () => {
+  useSettingsStore.setState({ battleOutcome: "lose" });
+  await renderApp("/stable/squirtle-starter");
+
+  await fireEvent.press(screen.getByText("Battle"));
+
+  // Quitting the app mid-animation must not undo a loss.
+  const state = useGameStore.getState().state!;
+  expect(state.roundsPlayed).toBe(1);
+  expect(state.stable[0]).toMatchObject({ wins: 0, losses: 1 });
 });

@@ -7,8 +7,11 @@ import {
   settlementFailureMessage,
 } from "@/api/settlement";
 import { getSpeciesBySlug } from "@/data/catalog";
+import type { CatalogSpecies } from "@/data/catalog.schema";
+import { pickChallenger, prizeMoneyForWin, rollPlayerWins } from "@/lib/battle";
 import { markPriceFromRecord } from "@/lib/pricing";
 import { mmkvStorage } from "@/store/mmkv";
+import type { BattleOutcome } from "@/store/settings";
 
 export type StarterId = "bulbasaur" | "charmander" | "squirtle";
 
@@ -88,6 +91,13 @@ export type ResolveBattleInput = {
   prizeMoney: number;
 };
 
+/** A battle already settled into state, for the overlay to replay. */
+export type BattleResult = {
+  challenger: CatalogSpecies;
+  playerWins: boolean;
+  prizeMoney: number;
+};
+
 export type PurchaseListingInput = {
   listingId: string;
   slug: string;
@@ -116,6 +126,8 @@ type GameStore = {
   createState: (starterId: StarterId) => void;
   clearState: () => void;
   resolveBattle: (input: ResolveBattleInput) => void;
+  /** Rolls a battle and settles it immediately; `null` if the Pokémon can't fight. */
+  startBattle: (ownedId: string, outcome: BattleOutcome) => BattleResult | null;
   purchaseListing: (input: PurchaseListingInput) => PurchaseResult;
   sellOwned: (ownedId: string) => SellResult;
   applySettlement: (txnId: string, result: SettlementResult) => void;
@@ -313,6 +325,27 @@ export const useGameStore = create<GameStore>()(
             },
           };
         }),
+      startBattle: (ownedId, outcome) => {
+        const fighter = get().state?.stable.find((owned) => owned.id === ownedId);
+        if (!fighter || fighter.pending) {
+          return null;
+        }
+
+        const challenger = pickChallenger(fighter.speciesId);
+        const playerWins = rollPlayerWins(outcome);
+        const prizeMoney = playerWins ? prizeMoneyForWin(challenger) : 0;
+
+        // Settle before any animation runs, so quitting mid-battle can't undo it.
+        get().resolveBattle({
+          ownedId,
+          challengerSlug: challenger.slug,
+          challengerName: challenger.name,
+          won: playerWins,
+          prizeMoney,
+        });
+
+        return { challenger, playerWins, prizeMoney };
+      },
       purchaseListing: ({
         listingId,
         slug,

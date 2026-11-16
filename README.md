@@ -41,6 +41,7 @@ flowchart LR
 - **Sales credit on settlement.** A sale is `pending` with no balance until it clears, so you can't spend proceeds you don't have yet. Overview and History show them separately as *pending from sales*.
 - **The ledger is append-only.** A failed purchase isn't edited away. It's marked `failed`, and a separate `refund` entry returns the money. Each posted entry records `balanceAfter`, and the entries always add up (checked by `expectRunningBalances` in every money test).
 - **The ledger is the queue.** Pending entries in the persisted ledger *are* the offline queue. Nothing is duplicated into a second store, so it survives restarts for free. The queue settles one transaction at a time, oldest first, only while online.
+- **Battles settle before they animate.** `startBattle` rolls and records the result, then the overlay replays it, so quitting mid-animation can't undo a loss.
 - **Rules that keep it honest:**
   - a Pokémon with a pending transaction can't battle or be sold
   - you can't sell your last Pokémon (you'd have nothing to earn with)
@@ -89,7 +90,6 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 
 ## Known limitations
 
-- **Force-quitting mid-battle discards the result.** The outcome is only committed when you tap *Continue*. The fix is to commit on roll and let the overlay replay it.
 - **Money is whole dollars.** Amounts are integers, but not minor units (cents), and they aren't locale-formatted (`$1234`, not `$1,234`).
 - **Light mode only.** Colours are hard-coded rather than themed.
 - **The chart is drawn with Views.** This avoids a native dependency and a dev-client rebuild; it should move to SVG.

@@ -140,9 +140,10 @@ Setup for all: O4 with Squirtle.
 - Battle → wait for overlay → `back`
 - Expect: round settled (Rounds `1`). Documents the `onRequestClose` path
 
-**B7 · Force-quit mid-battle (known bug B1)** [E2E]
-- `Always lose` → Battle → `stopApp` before Continue → `launchApp`
-- Current behaviour: loss discarded (record `0W–0L`, Rounds `0`). Keep this as an expected failure until B1 is fixed, then flip the assertion
+**B7 · Battle result survives a force-quit** [Both] ✅ RNTL
+- `Always lose` → Battle
+- Expect: the loss is recorded as soon as Battle is pressed (Rounds `1`, record `0W–1L`), before `Continue`
+- E2E: `stopApp` before Continue → `launchApp` → still `0W–1L`, Rounds `1`
 
 ---
 

@@ -2,26 +2,14 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import type { CatalogSpecies } from "@/data/catalog.schema";
 import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
 import { BattleAction } from "@/modules/active/screens/PokemonDetail/BattleAction";
 import { BattleOverlay } from "@/modules/active/screens/PokemonDetail/BattleOverlay";
-import {
-  pickChallenger,
-  prizeMoneyForWin,
-  rollPlayerWins,
-} from "@/modules/active/screens/PokemonDetail/battle";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromOwned } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { SellAction } from "@/modules/active/screens/PokemonDetail/SellAction";
-import { type OwnedPokemon, useGameStore } from "@/store/game";
+import { type BattleResult, type OwnedPokemon, useGameStore } from "@/store/game";
 import { useBattleOutcome, useIsOnline } from "@/store/settings";
-
-type BattleSession = {
-  challenger: CatalogSpecies;
-  playerWins: boolean;
-  prizeMoney: number;
-};
 
 function ownedStatusMessage(args: {
   owned: OwnedPokemon;
@@ -54,7 +42,7 @@ export default function StableOwnedDetailRoute() {
     store.state?.stable.find((item) => item.id === ownedId),
   );
   const battleHistory = useGameStore((store) => store.state?.battleHistory ?? []);
-  const resolveBattle = useGameStore((store) => store.resolveBattle);
+  const startBattle = useGameStore((store) => store.startBattle);
   const sellOwned = useGameStore((store) => store.sellOwned);
   const keepingCount = useGameStore(
     (store) =>
@@ -63,7 +51,7 @@ export default function StableOwnedDetailRoute() {
   );
   const battleOutcome = useBattleOutcome();
   const isOnline = useIsOnline();
-  const [battle, setBattle] = useState<BattleSession | null>(null);
+  const [battle, setBattle] = useState<BattleResult | null>(null);
 
   const pokemon = owned ? pokemonFromOwned(owned) : null;
   const ownedBattleHistory = useMemo(
@@ -99,15 +87,7 @@ export default function StableOwnedDetailRoute() {
           <View style={styles.actions}>
             <BattleAction
               disabled={battle !== null || isPending}
-              onPress={() => {
-                const challenger = pickChallenger(pokemon.slug);
-                const playerWins = rollPlayerWins(battleOutcome);
-                setBattle({
-                  challenger,
-                  playerWins,
-                  prizeMoney: playerWins ? prizeMoneyForWin(challenger) : 0,
-                });
-              }}
+              onPress={() => setBattle(startBattle(owned.id, battleOutcome))}
             />
             <SellAction
               price={owned.markPrice}
@@ -129,16 +109,7 @@ export default function StableOwnedDetailRoute() {
           challenger={battle.challenger}
           playerWins={battle.playerWins}
           prizeMoney={battle.prizeMoney}
-          onFinished={() => {
-            resolveBattle({
-              ownedId: pokemon.id,
-              challengerSlug: battle.challenger.slug,
-              challengerName: battle.challenger.name,
-              won: battle.playerWins,
-              prizeMoney: battle.prizeMoney,
-            });
-            setBattle(null);
-          }}
+          onFinished={() => setBattle(null)}
         />
       ) : null}
     </>
