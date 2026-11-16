@@ -561,6 +561,9 @@ export const useCashHistory = () =>
 export const useLedger = () =>
   useGameStore((store) => store.state?.ledger ?? EMPTY_LEDGER);
 
+export const useLedgerEntry = (id: string | undefined) =>
+  useGameStore((store) => store.state?.ledger.find((entry) => entry.id === id));
+
 /** Oldest pending transaction — the head of the settlement queue. */
 export const useNextPendingTransactionId = () =>
   useGameStore((store) =>

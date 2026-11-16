@@ -1,6 +1,7 @@
 import { LegendList } from "@legendapp/list/react-native";
+import { Link } from "expo-router";
 import { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { formatAmount, statusLabel, typeLabel } from "@/lib/ledger";
 import {
@@ -15,7 +16,19 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
   const status = statusLabel(item.status);
 
   return (
-    <View style={[styles.row, item.status === "pending" && styles.rowPending]}>
+    <Link
+      href={{
+        pathname: "/history/[entryId]",
+        params: { entryId: item.id },
+      }}
+      asChild
+    >
+      <Pressable
+        style={StyleSheet.flatten([
+          styles.row,
+          item.status === "pending" && styles.rowPending,
+        ])}
+      >
         <View style={styles.rowCopy}>
           <Text style={styles.rowType}>
             {typeLabel(item.type)}
@@ -47,7 +60,8 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
             <Text style={styles.balance}>Bal ${item.balanceAfter}</Text>
           ) : null}
         </View>
-    </View>
+      </Pressable>
+    </Link>
   );
 }
 
