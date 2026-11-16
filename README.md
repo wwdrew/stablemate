@@ -59,7 +59,7 @@ flowchart LR
 
 ```bash
 cd StableMate
-npm test        # 37 tests, ~3s
+npm test        # full suite, a few seconds
 npx tsc --noEmit
 ```
 
