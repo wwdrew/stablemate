@@ -553,10 +553,6 @@ export const useRoundsPlayed = () =>
 export const useCash = () => useGameStore((store) => store.state?.cash ?? 0);
 
 const EMPTY_LEDGER: LedgerEntry[] = [];
-const EMPTY_CASH_HISTORY: CashHistoryEntry[] = [];
-
-export const useCashHistory = () =>
-  useGameStore((store) => store.state?.cashHistory ?? EMPTY_CASH_HISTORY);
 
 export const useLedger = () =>
   useGameStore((store) => store.state?.ledger ?? EMPTY_LEDGER);

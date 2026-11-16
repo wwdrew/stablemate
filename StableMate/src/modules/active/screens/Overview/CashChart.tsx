@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { useCashHistory } from "@/store/game";
+import { useLedger } from "@/store/game";
 
 const PAD = 12;
 const STROKE = 2;
@@ -53,19 +53,32 @@ function splitAtZero(points: Point[], baselineY: number): [Point, Point][] {
   return segments;
 }
 
-/** Cash after each round. Baseline is $0 through the vertical centre. */
+/**
+ * Cash after every movement that posted to the ledger, oldest first, from the
+ * $0 starting balance. Baseline is $0 through the vertical centre.
+ */
 export function CashChart() {
-  const cashHistory = useCashHistory();
+  const ledger = useLedger();
+  const balances = useMemo(
+    () => [
+      0,
+      // Ledger is newest-first by posting time; pending sale credits have no balance yet.
+      ...[...ledger]
+        .reverse()
+        .flatMap((entry) => (entry.balanceAfter === null ? [] : [entry.balanceAfter])),
+    ],
+    [ledger],
+  );
   const [width, setWidth] = useState(0);
   const height = width / 2;
   const baselineY = height / 2;
 
-  const maxAbs = Math.max(1, ...cashHistory.map((entry) => Math.abs(entry.cash)));
-  const step = cashHistory.length > 1 ? (width - PAD * 2) / (cashHistory.length - 1) : 0;
-  const points: Point[] = cashHistory.map((entry, index) => ({
+  const maxAbs = Math.max(1, ...balances.map((cash) => Math.abs(cash)));
+  const step = balances.length > 1 ? (width - PAD * 2) / (balances.length - 1) : 0;
+  const points: Point[] = balances.map((cash, index) => ({
     x: PAD + index * step,
-    y: baselineY - (entry.cash / maxAbs) * (baselineY - PAD),
-    cash: entry.cash,
+    y: baselineY - (cash / maxAbs) * (baselineY - PAD),
+    cash,
   }));
 
   return (
@@ -74,7 +87,7 @@ export function CashChart() {
       <View
         style={[styles.plot, { height }]}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-        accessibilityLabel={`Cash over ${cashHistory.length - 1} rounds`}
+        accessibilityLabel={`Cash over ${balances.length - 1} transactions`}
       >
         {width > 0 ? (
           <>
@@ -86,8 +99,8 @@ export function CashChart() {
             ))}
           </>
         ) : null}
-        {cashHistory.length < 2 ? (
-          <Text style={styles.empty}>Finish a round to start the chart.</Text>
+        {balances.length < 2 ? (
+          <Text style={styles.empty}>Win a prize or trade to start the chart.</Text>
         ) : null}
       </View>
     </View>
