@@ -7,8 +7,8 @@ import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitl
 import { BuyAction } from "@/modules/active/screens/PokemonDetail/BuyAction";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromListing } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
-import { useIsOnline } from "@/state/connectivity";
 import { useCash, useGameStore } from "@/store/game";
+import { useIsOnline } from "@/store/settings";
 
 function failureReasonMessage(
   reason: "insufficient_funds" | "already_purchased" | "no_state",
@@ -59,7 +59,7 @@ export default function BuyListingDetailRoute() {
   const { listingId } = useLocalSearchParams<{ listingId: string }>();
   const { data: listings = [], isPending } = useMarketLot();
   const cash = useCash();
-  const [isOnline] = useIsOnline();
+  const isOnline = useIsOnline();
   const purchaseListing = useGameStore((store) => store.purchaseListing);
   const [failureReason, setFailureReason] = useState<
     "insufficient_funds" | "already_purchased" | "no_state" | null

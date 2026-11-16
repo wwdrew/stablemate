@@ -1,12 +1,13 @@
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useIsOnline } from "@/state/connectivity";
 import { useGameStore } from "@/store/game";
+import { useIsOnline, useSettingsStore } from "@/store/settings";
 
 export function OptionsScreen() {
   const insets = useSafeAreaInsets();
-  const [isOnline, setIsOnline] = useIsOnline();
+  const isOnline = useIsOnline();
+  const setIsOnline = useSettingsStore((store) => store.setIsOnline);
   const clearState = useGameStore((store) => store.clearState);
 
   return (
