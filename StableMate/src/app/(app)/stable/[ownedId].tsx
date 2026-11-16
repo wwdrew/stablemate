@@ -14,6 +14,7 @@ import {
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromOwned } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { useGameStore } from "@/store/game";
+import { useBattleOutcome } from "@/store/settings";
 
 type BattleSession = {
   challenger: CatalogSpecies;
@@ -28,6 +29,7 @@ export default function StableOwnedDetailRoute() {
   );
   const battleHistory = useGameStore((store) => store.state?.battleHistory ?? []);
   const resolveBattle = useGameStore((store) => store.resolveBattle);
+  const battleOutcome = useBattleOutcome();
   const [battle, setBattle] = useState<BattleSession | null>(null);
 
   const pokemon = owned ? pokemonFromOwned(owned) : null;
@@ -61,7 +63,7 @@ export default function StableOwnedDetailRoute() {
             disabled={battle !== null}
             onPress={() => {
               const challenger = pickChallenger(pokemon.slug);
-              const playerWins = rollPlayerWins();
+              const playerWins = rollPlayerWins(battleOutcome);
               setBattle({
                 challenger,
                 playerWins,

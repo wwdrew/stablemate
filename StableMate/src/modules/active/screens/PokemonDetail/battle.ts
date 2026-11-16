@@ -1,5 +1,6 @@
 import { getCatalogSpecies } from "@/data/catalog";
 import type { CatalogSpecies } from "@/data/catalog.schema";
+import type { BattleOutcome } from "@/store/settings";
 
 export function pickChallenger(excludeSlug: string): CatalogSpecies {
   const pool = getCatalogSpecies().filter(
@@ -13,7 +14,10 @@ export function pickChallenger(excludeSlug: string): CatalogSpecies {
 }
 
 /** Demo-biased: favour the player so battles feel good to show. */
-export function rollPlayerWins(): boolean {
+export function rollPlayerWins(outcome: BattleOutcome = "random"): boolean {
+  if (outcome !== "random") {
+    return outcome === "win";
+  }
   return Math.random() < 0.7;
 }
 

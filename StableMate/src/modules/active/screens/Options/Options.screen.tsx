@@ -2,12 +2,25 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGameStore } from "@/store/game";
-import { useIsOnline, useSettingsStore } from "@/store/settings";
+import {
+  type BattleOutcome,
+  useBattleOutcome,
+  useIsOnline,
+  useSettingsStore,
+} from "@/store/settings";
+
+const BATTLE_OUTCOME_OPTIONS: { value: BattleOutcome; label: string }[] = [
+  { value: "random", label: "Random" },
+  { value: "win", label: "Always win" },
+  { value: "lose", label: "Always lose" },
+];
 
 export function OptionsScreen() {
   const insets = useSafeAreaInsets();
   const isOnline = useIsOnline();
   const setIsOnline = useSettingsStore((store) => store.setIsOnline);
+  const battleOutcome = useBattleOutcome();
+  const setBattleOutcome = useSettingsStore((store) => store.setBattleOutcome);
   const clearState = useGameStore((store) => store.clearState);
 
   return (
@@ -30,6 +43,34 @@ export function OptionsScreen() {
           trackColor={{ false: "#D6D3D1", true: "#1C1917" }}
           thumbColor="#FAFAF9"
         />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Battle outcome</Text>
+        <View style={styles.segmented}>
+          {BATTLE_OUTCOME_OPTIONS.map((option) => {
+            const selected = battleOutcome === option.value;
+
+            return (
+              <Pressable
+                key={option.value}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                onPress={() => setBattleOutcome(option.value)}
+                style={[styles.segment, selected && styles.segmentSelected]}
+              >
+                <Text
+                  style={[
+                    styles.segmentLabel,
+                    selected && styles.segmentLabelSelected,
+                  ]}
+                >
+                  {option.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -93,6 +134,28 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     textTransform: "uppercase",
     color: "#A8A29E",
+  },
+  segmented: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#E7E5E4",
+    backgroundColor: "#FFFCF7",
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  segmentSelected: {
+    backgroundColor: "#1C1917",
+  },
+  segmentLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#57534E",
+  },
+  segmentLabelSelected: {
+    color: "#FFFCF7",
   },
   dangerButton: {
     backgroundColor: "#FFFCF7",
