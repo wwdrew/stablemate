@@ -3,7 +3,8 @@ import { Link } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatAmount, statusLabel, typeLabel } from "@/lib/ledger";
+import { statusLabel, typeLabel } from "@/lib/ledger";
+import { formatMoney, formatSignedMoney } from "@/lib/money";
 import {
   type LedgerEntry,
   useCash,
@@ -54,10 +55,10 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
               item.status === "failed" && styles.amountFailed,
             ]}
           >
-            {formatAmount(item.amount)}
+            {formatSignedMoney(item.amount)}
           </Text>
           {item.balanceAfter !== null ? (
-            <Text style={styles.balance}>Bal ${item.balanceAfter}</Text>
+            <Text style={styles.balance}>Bal {formatMoney(item.balanceAfter)}</Text>
           ) : null}
         </View>
       </Pressable>
@@ -95,10 +96,10 @@ export function HistoryScreen() {
           </Text>
           <View style={styles.balanceCard}>
             <Text style={styles.balanceLabel}>Current balance</Text>
-            <Text style={styles.balanceValue}>${cash}</Text>
+            <Text style={styles.balanceValue}>{formatMoney(cash)}</Text>
             {pendingCredits > 0 ? (
               <Text style={styles.balancePending}>
-                +${pendingCredits} pending from sales
+                {formatSignedMoney(pendingCredits)} pending from sales
               </Text>
             ) : null}
             <Text style={styles.balanceMeta}>

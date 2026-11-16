@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { formatMoney } from "@/lib/money";
 import { useCash } from "@/store/game";
 
 export function CashDisplay() {
@@ -8,7 +9,7 @@ export function CashDisplay() {
   return (
     <View style={styles.card}>
       <Text style={styles.label}>Cash</Text>
-      <Text style={styles.value}>${cash}</Text>
+      <Text style={styles.value}>{formatMoney(cash)}</Text>
     </View>
   );
 }

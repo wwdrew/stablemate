@@ -3,6 +3,7 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useMarketLot } from "@/api/useMarketLot";
+import { formatMoney } from "@/lib/money";
 import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
 import { BuyAction } from "@/modules/active/screens/PokemonDetail/BuyAction";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
@@ -23,7 +24,7 @@ function failureReasonMessage(
     case "insufficient_funds": {
       const shortfall = Math.max(0, price - cash);
       return shortfall > 0
-        ? `Insufficient funds — need $${shortfall} more.`
+        ? `Insufficient funds — need ${formatMoney(shortfall)} more.`
         : "Insufficient funds.";
     }
     default: {

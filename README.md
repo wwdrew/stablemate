@@ -90,7 +90,7 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 
 ## Known limitations
 
-- **Money is whole dollars.** Amounts are integers, but not minor units (cents), and they aren't locale-formatted (`$1234`, not `$1,234`).
+- **Money is whole dollars.** Amounts are integers, but not minor units (cents). Display goes through one `formatMoney` helper (`Intl.NumberFormat`), so moving to cents is a store change, not a UI one.
 - **Light mode only.** Colours are hard-coded rather than themed.
 - **The chart is drawn with Views.** This avoids a native dependency and a dev-client rebuild; it should move to SVG.
 - **No E2E flows or CI yet.** The scenarios are written and tagged for Maestro but not automated.
@@ -99,5 +99,5 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 
 - **Pay in 4.** Split a purchase into instalments debited over the next rounds, with a missed-payment path when funds are short. It reuses holds, pending entries, the queue and the receipt.
 - Maestro flows for the tagged scenarios, plus CI running typecheck, lint and tests.
-- Integer minor units with a single `formatMoney` helper, theme tokens with dark mode, and the SVG chart.
+- Integer minor units (cents), theme tokens with dark mode, and the SVG chart.
 - Filters on History for open, closed and failed transactions, and a settlement timeline on the receipt.

@@ -313,6 +313,6 @@ Run once per platform as the release gate.
 - `prizeMoneyForWin`: 22% of list, `$75` floor
 - `rollPlayerWins`: forced outcomes; `random` uses `Math.random() < 0.7` (mock the boundary)
 - `decideSettlement`: forced outcomes; random thresholds 10% / 20%; reason per type
-- `formatAmount`, `typeLabel`, `statusLabel`, `settlementFailureMessage`: every branch
+- `formatMoney` / `formatSignedMoney` (thousands grouping, signs) ✅, `typeLabel`, `statusLabel`, `settlementFailureMessage`: every branch
 - Store actions: ✅ `__tests__/store.test.ts` (9 cases: holds, refunds, sale posting order, rollback, battle lock, idempotency)
 - `merge` migration: old persisted state with no `status` / `pending` / `ownedId` hydrates as settled / null

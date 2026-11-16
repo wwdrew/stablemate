@@ -7,6 +7,7 @@ import {
   settlementFailureMessage,
 } from "@/api/settlement";
 import { getSpeciesBySlug } from "@/data/catalog";
+import { formatMoney } from "@/lib/money";
 import { useGameStore, useNextPendingTransactionId } from "@/store/game";
 import { useIsOnline, useSettingsStore } from "@/store/settings";
 
@@ -48,7 +49,7 @@ export function useSettlementQueue() {
         } else {
           Alert.alert(
             "Purchase failed",
-            `${reason}. $${-entry.amount} has been refunded.`,
+            `${reason}. ${formatMoney(-entry.amount)} has been refunded.`,
           );
         }
       }

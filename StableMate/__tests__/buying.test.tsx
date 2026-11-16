@@ -12,6 +12,7 @@ import {
   seedMarket,
   setSettings,
   settleNext,
+  usd,
 } from "../test/fixtures";
 import { renderApp, resetStores, withinTab } from "../test/renderApp";
 
@@ -34,7 +35,7 @@ afterEach(() => {
 
 async function buyGengar() {
   await renderApp(`/buy/${gengar.id}`);
-  await fireEvent.press(screen.getByRole("button", { name: `Buy · $${price}` }));
+  await fireEvent.press(screen.getByRole("button", { name: `Buy · ${usd(price)}` }));
 }
 
 test("P1 · insufficient funds blocks the purchase and shows the shortfall", async () => {
@@ -42,9 +43,9 @@ test("P1 · insufficient funds blocks the purchase and shows the shortfall", asy
   await renderApp(`/buy/${gengar.id}`);
 
   expect(
-    screen.getByText(`Insufficient funds — need $${price - 100} more.`),
+    screen.getByText(`Insufficient funds — need ${usd(price - 100)} more.`),
   ).toBeOnTheScreen();
-  expect(screen.getByRole("button", { name: `Buy · $${price}` })).toBeDisabled();
+  expect(screen.getByRole("button", { name: `Buy · ${usd(price)}` })).toBeDisabled();
 });
 
 test("P2 · an online purchase holds funds immediately, then settles", async () => {
@@ -57,14 +58,14 @@ test("P2 · an online purchase holds funds immediately, then settles", async () 
   const buy = withinTab("buy");
   expect(buy.getByText(/1 for sale/)).toBeOnTheScreen();
   expect(buy.queryByText("Gengar")).not.toBeOnTheScreen();
-  expect(withinTab("(overview)").getByText(`$${1000 - price}`)).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText(`${usd(1000 - price)}`)).toBeOnTheScreen();
   expect(withinTab("stable").getByText("Buying · pending")).toBeOnTheScreen();
 
   const history = withinTab("history");
   expect(history.getByText("Purchase · Pending")).toBeOnTheScreen();
   expect(history.getByText("Bought Gengar")).toBeOnTheScreen();
-  expect(history.getByText(`-$${price}`)).toBeOnTheScreen();
-  expect(history.getByText(`Bal $${1000 - price}`)).toBeOnTheScreen();
+  expect(history.getByText(`-${usd(price)}`)).toBeOnTheScreen();
+  expect(history.getByText(`Bal ${usd(1000 - price)}`)).toBeOnTheScreen();
 
   await settleNext();
 
@@ -72,7 +73,7 @@ test("P2 · an online purchase holds funds immediately, then settles", async () 
   expect(history.queryByText("Purchase · Pending")).not.toBeOnTheScreen();
   expect(history.getByText("Purchase")).toBeOnTheScreen();
   // The hold became the debit — cash doesn't move again on settlement.
-  expect(withinTab("(overview)").getByText(`$${1000 - price}`)).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText(`${usd(1000 - price)}`)).toBeOnTheScreen();
   expect(useGameStore.getState().state!.stable.find((o) => o.id === ownedId)).toMatchObject({
     wins: 2,
     losses: 1,
@@ -91,7 +92,7 @@ test("P3 · an offline purchase queues until the network returns", async () => {
       "You’re offline — funds are held now and the purchase settles when you reconnect.",
     ),
   ).toBeOnTheScreen();
-  await fireEvent.press(screen.getByRole("button", { name: `Buy · $${price}` }));
+  await fireEvent.press(screen.getByRole("button", { name: `Buy · ${usd(price)}` }));
 
   await settleNext();
   await settleNext();
@@ -115,9 +116,9 @@ test("P4 · a failed purchase refunds the hold with a separate entry", async () 
 
   expect(Alert.alert).toHaveBeenCalledWith(
     "Purchase failed",
-    `Sold out before your order cleared. $${price} has been refunded.`,
+    `Sold out before your order cleared. ${usd(price)} has been refunded.`,
   );
-  expect(withinTab("(overview)").getByText("$1000")).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText("$1,000")).toBeOnTheScreen();
   expect(withinTab("stable").queryByText("Gengar")).not.toBeOnTheScreen();
   // Sold out, so it doesn't come back to the lot.
   expect(withinTab("buy").queryByText("Gengar")).not.toBeOnTheScreen();
@@ -125,8 +126,8 @@ test("P4 · a failed purchase refunds the hold with a separate entry", async () 
   const history = withinTab("history");
   expect(history.getByText("Refund")).toBeOnTheScreen();
   expect(history.getByText("Refund · Gengar")).toBeOnTheScreen();
-  expect(history.getByText(`+$${price}`)).toBeOnTheScreen();
-  expect(history.getByText("Bal $1000")).toBeOnTheScreen();
+  expect(history.getByText(`+${usd(price)}`)).toBeOnTheScreen();
+  expect(history.getByText("Bal $1,000")).toBeOnTheScreen();
   expect(history.getByText("Purchase · Failed")).toBeOnTheScreen();
   expectRunningBalances(1000);
 });
@@ -139,7 +140,7 @@ test("P5 · a held purchase can't be spent twice", async () => {
   await fireEvent.press(screen.getByText("Onix"));
 
   expect(
-    screen.getByText(`Insufficient funds — need $${onix.markPrice - 100} more.`),
+    screen.getByText(`Insufficient funds — need ${usd(onix.markPrice - 100)} more.`),
   ).toBeOnTheScreen();
 });
 
@@ -155,7 +156,7 @@ test("P6 · a pending purchase can't battle or be sold", async () => {
     screen.getByText("Purchase pending. Settles when you’re back online."),
   ).toBeOnTheScreen();
   expect(screen.getByRole("button", { name: "Battle" })).toBeDisabled();
-  expect(screen.getByRole("button", { name: `Sell · $${price}` })).toBeDisabled();
+  expect(screen.getByRole("button", { name: `Sell · ${usd(price)}` })).toBeDisabled();
 });
 
 test("P8 · queued purchases settle oldest first", async () => {
@@ -164,7 +165,7 @@ test("P8 · queued purchases settle oldest first", async () => {
 
   await buyGengar();
   await fireEvent.press(screen.getByText("Onix"));
-  await fireEvent.press(screen.getByRole("button", { name: `Buy · $${onix.markPrice}` }));
+  await fireEvent.press(screen.getByRole("button", { name: `Buy · ${usd(onix.markPrice)}` }));
 
   await setSettings({ isOnline: true });
   await settleNext();

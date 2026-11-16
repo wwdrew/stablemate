@@ -1,7 +1,8 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { settlementFailureMessage } from "@/api/settlement";
-import { formatAmount, typeLabel } from "@/lib/ledger";
+import { typeLabel } from "@/lib/ledger";
+import { formatMoney, formatSignedMoney } from "@/lib/money";
 import type { LedgerEntry, TransactionStatus } from "@/store/game";
 
 type ReceiptScreenProps = {
@@ -23,7 +24,7 @@ function formatTimestamp(iso: string | null): string {
 
 function balanceCopy(entry: LedgerEntry): string {
   if (entry.balanceAfter !== null) {
-    return `$${entry.balanceAfter}`;
+    return formatMoney(entry.balanceAfter);
   }
   return entry.status === "failed" ? "Not credited" : "Credits on settlement";
 }
@@ -68,7 +69,7 @@ export function ReceiptScreen({ entry }: ReceiptScreenProps) {
             entry.status === "failed" && styles.heroAmountFailed,
           ]}
         >
-          {formatAmount(entry.amount)}
+          {formatSignedMoney(entry.amount)}
         </Text>
         <Text style={styles.heroSubtitle}>{entry.subtitle}</Text>
       </View>

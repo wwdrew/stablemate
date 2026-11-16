@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
+import { formatMoney, formatSignedMoney } from "@/lib/money";
 import { useGameStore, useNetWorth, usePendingCredits } from "@/store/game";
 
 import { CashChart } from "./CashChart";
@@ -33,10 +34,10 @@ export function OverviewScreen() {
 
       <View style={styles.card}>
         <Text style={styles.label}>Net worth</Text>
-        <Text style={styles.value}>${netWorth}</Text>
+        <Text style={styles.value}>{formatMoney(netWorth)}</Text>
         <Text style={styles.meta}>
           Cash + stable at mark price
-          {pendingCredits > 0 ? ` · +$${pendingCredits} sales pending` : ""}
+          {pendingCredits > 0 ? ` · ${formatSignedMoney(pendingCredits)} sales pending` : ""}
         </Text>
       </View>
 

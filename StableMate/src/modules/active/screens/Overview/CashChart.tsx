@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { formatMoney } from "@/lib/money";
 import { useLedger } from "@/store/game";
 
 const PAD = 12;
@@ -92,8 +93,8 @@ export function CashChart() {
         {width > 0 ? (
           <>
             <View style={[styles.baseline, { top: baselineY }]} />
-            <Text style={[styles.axisLabel, { top: 0 }]}>${maxAbs}</Text>
-            <Text style={[styles.axisLabel, { top: baselineY + 2 }]}>$0</Text>
+            <Text style={[styles.axisLabel, { top: 0 }]}>{formatMoney(maxAbs)}</Text>
+            <Text style={[styles.axisLabel, { top: baselineY + 2 }]}>{formatMoney(0)}</Text>
             {splitAtZero(points, baselineY).map(([from, to], index) => (
               <Segment key={index} from={from} to={to} />
             ))}

@@ -10,6 +10,7 @@ import {
 
 import { useMarketLot } from "@/api/useMarketLot";
 import type { MarketListing } from "@/api/marketLot";
+import { formatMoney } from "@/lib/money";
 
 function ListingRow({ item }: { item: MarketListing }) {
   const record = `${item.wins}W–${item.losses}L`;
@@ -31,9 +32,9 @@ function ListingRow({ item }: { item: MarketListing }) {
           </Text>
         </View>
         <View style={styles.priceBlock}>
-          <Text style={styles.price}>${item.markPrice}</Text>
+          <Text style={styles.price}>{formatMoney(item.markPrice)}</Text>
           {item.markPrice !== item.listPrice ? (
-            <Text style={styles.listPrice}>list ${item.listPrice}</Text>
+            <Text style={styles.listPrice}>list {formatMoney(item.listPrice)}</Text>
           ) : null}
         </View>
       </Pressable>

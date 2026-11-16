@@ -11,6 +11,7 @@ import {
   seedGame,
   setSettings,
   settleNext,
+  usd,
 } from "../test/fixtures";
 import { renderApp, resetStores, withinTab } from "../test/renderApp";
 
@@ -33,7 +34,7 @@ afterEach(() => {
 async function sellGengar() {
   seedGame({ cash: CASH, stable: [gengar] });
   await renderApp(`/stable/${gengar.id}`);
-  await fireEvent.press(screen.getByRole("button", { name: `Sell · $${price}` }));
+  await fireEvent.press(screen.getByRole("button", { name: `Sell · ${usd(price)}` }));
 }
 
 test("S1 · you can't sell your last Pokémon", async () => {
@@ -42,7 +43,7 @@ test("S1 · you can't sell your last Pokémon", async () => {
 
   expect(screen.getByText("You can’t sell your last Pokémon.")).toBeOnTheScreen();
   expect(
-    screen.getByRole("button", { name: `Sell · $${STARTER_PRICE}` }),
+    screen.getByRole("button", { name: `Sell · ${usd(STARTER_PRICE)}` }),
   ).toBeDisabled();
 });
 
@@ -55,27 +56,27 @@ test("S2 · a sale stays pending without crediting, then settles into cash", asy
   // Optimistic: back on the list, marked as selling, proceeds not yet spendable.
   expect(withinTab("stable").getByText("Selling · pending")).toBeOnTheScreen();
   const overview = withinTab("(overview)");
-  expect(overview.getByText(`$${CASH}`)).toBeOnTheScreen();
-  expect(overview.getByText(`$${netWorth}`)).toBeOnTheScreen();
-  expect(overview.getByText(new RegExp(`\\+\\$${price} sales pending`))).toBeOnTheScreen();
+  expect(overview.getByText(`${usd(CASH)}`)).toBeOnTheScreen();
+  expect(overview.getByText(`${usd(netWorth)}`)).toBeOnTheScreen();
+  expect(overview.getByText(`+${usd(price)} sales pending`, { exact: false })).toBeOnTheScreen();
 
   const history = withinTab("history");
   expect(history.getByText("Sale · Pending")).toBeOnTheScreen();
   expect(history.getByText("Sold Gengar")).toBeOnTheScreen();
-  expect(history.getByText(`+$${price}`)).toBeOnTheScreen();
-  expect(history.getByText(`+$${price} pending from sales`)).toBeOnTheScreen();
+  expect(history.getByText(`+${usd(price)}`)).toBeOnTheScreen();
+  expect(history.getByText(`+${usd(price)} pending from sales`)).toBeOnTheScreen();
   expect(history.queryByText(/^Bal /)).not.toBeOnTheScreen();
 
   await settleNext();
 
-  expect(overview.getByText(`$${CASH + price}`)).toBeOnTheScreen();
+  expect(overview.getByText(`${usd(CASH + price)}`)).toBeOnTheScreen();
   // Asset swapped for cash at mark price: net worth doesn't move.
-  expect(overview.getByText(`$${netWorth}`)).toBeOnTheScreen();
+  expect(overview.getByText(`${usd(netWorth)}`)).toBeOnTheScreen();
   expect(overview.queryByText(/sales pending/)).not.toBeOnTheScreen();
   expect(withinTab("stable").getByText("1 Pokémon owned")).toBeOnTheScreen();
   expect(withinTab("stable").queryByText("Gengar")).not.toBeOnTheScreen();
   expect(history.getByText("Sale")).toBeOnTheScreen();
-  expect(history.getByText(`Bal $${CASH + price}`)).toBeOnTheScreen();
+  expect(history.getByText(`Bal ${usd(CASH + price)}`)).toBeOnTheScreen();
   expect(history.queryByText(/pending from sales/)).not.toBeOnTheScreen();
   expect(useGameStore.getState().state!.ledger[0]).toMatchObject({
     type: "sale",
@@ -91,12 +92,12 @@ test("S3 · an offline sale queues until the network returns", async () => {
   await settleNext();
   await settleNext();
   expect(withinTab("stable").getByText("Selling · pending")).toBeOnTheScreen();
-  expect(withinTab("(overview)").getByText(`$${CASH}`)).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText(`${usd(CASH)}`)).toBeOnTheScreen();
 
   await setSettings({ isOnline: true });
   await settleNext();
 
-  expect(withinTab("(overview)").getByText(`$${CASH + price}`)).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText(`${usd(CASH + price)}`)).toBeOnTheScreen();
   expect(withinTab("stable").queryByText("Gengar")).not.toBeOnTheScreen();
   expectRunningBalances(CASH);
 });
@@ -111,14 +112,14 @@ test("S4 · a failed sale puts the Pokémon back without moving cash", async () 
     "Sale failed",
     "No buyers at your price. Gengar is back in your stable.",
   );
-  expect(withinTab("(overview)").getByText(`$${CASH}`)).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText(`${usd(CASH)}`)).toBeOnTheScreen();
   expect(withinTab("stable").getByText("Gengar")).toBeOnTheScreen();
   expect(withinTab("stable").queryByText("Selling · pending")).not.toBeOnTheScreen();
   expect(withinTab("history").getByText("Sale · Failed")).toBeOnTheScreen();
 
   await act(() => router.navigate(`/stable/${gengar.id}`));
   expect(screen.getByRole("button", { name: "Battle" })).toBeEnabled();
-  expect(screen.getByRole("button", { name: `Sell · $${price}` })).toBeEnabled();
+  expect(screen.getByRole("button", { name: `Sell · ${usd(price)}` })).toBeEnabled();
   expectRunningBalances(CASH);
 });
 
@@ -130,7 +131,7 @@ test("S5 · a Pokémon being sold doesn't count towards keeping one", async () =
 
   expect(screen.getByText("You can’t sell your last Pokémon.")).toBeOnTheScreen();
   expect(
-    screen.getByRole("button", { name: `Sell · $${STARTER_PRICE}` }),
+    screen.getByRole("button", { name: `Sell · ${usd(STARTER_PRICE)}` }),
   ).toBeDisabled();
 });
 
@@ -141,8 +142,8 @@ test("S6 · a Pokémon with a pending sale can't battle or be sold again", async
   await act(() => router.navigate(`/stable/${gengar.id}`));
 
   expect(
-    screen.getByText(`Sale pending at $${price}. Settles when you’re back online.`),
+    screen.getByText(`Sale pending at ${usd(price)}. Settles when you’re back online.`),
   ).toBeOnTheScreen();
   expect(screen.getByRole("button", { name: "Battle" })).toBeDisabled();
-  expect(screen.getByRole("button", { name: `Sell · $${price}` })).toBeDisabled();
+  expect(screen.getByRole("button", { name: `Sell · ${usd(price)}` })).toBeDisabled();
 });

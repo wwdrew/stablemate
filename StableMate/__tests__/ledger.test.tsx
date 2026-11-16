@@ -11,6 +11,7 @@ import {
   seedGame,
   setSettings,
   settleNext,
+  usd,
 } from "../test/fixtures";
 import {
   renderApp,
@@ -138,7 +139,7 @@ test("H2 · running balances stay consistent across every kind of movement", asy
   ]);
   expectRunningBalances(CASH);
   expect(withinTab("history").getByText("6 transactions")).toBeOnTheScreen();
-  expect(withinTab("history").getByText(`$${store().state!.cash}`)).toBeOnTheScreen();
+  expect(withinTab("history").getByText(`${usd(store().state!.cash)}`)).toBeOnTheScreen();
 });
 
 describe("H4 · receipts", () => {
@@ -157,7 +158,7 @@ describe("H4 · receipts", () => {
 
     expect(receipt.getByText("Pending")).toBeOnTheScreen();
     expect(receipt.getByText("Credits on settlement")).toBeOnTheScreen();
-    expect(receipt.getByText(`+$${gengar.markPrice}`)).toBeOnTheScreen();
+    expect(receipt.getByText(`+${usd(gengar.markPrice)}`)).toBeOnTheScreen();
     expect(receipt.getByText("Market sale · Round 0")).toBeOnTheScreen();
   });
 
@@ -172,7 +173,7 @@ describe("H4 · receipts", () => {
     expect(receipt.getByText("Failed")).toBeOnTheScreen();
     expect(receipt.getByText("Failed at")).toBeOnTheScreen();
     expect(receipt.getByText("Sold out before your order cleared")).toBeOnTheScreen();
-    expect(receipt.getByText(`$${CASH - onix.markPrice}`)).toBeOnTheScreen();
+    expect(receipt.getByText(`${usd(CASH - onix.markPrice)}`)).toBeOnTheScreen();
     const entry = store().state!.ledger.find((item) => item.type === "purchase")!;
     expect(receipt.getByText(entry.id)).toBeOnTheScreen();
   });
@@ -187,7 +188,7 @@ describe("H4 · receipts", () => {
     expect(receipt.getByText("Settled")).toBeOnTheScreen();
     expect(receipt.getByText("Settled at")).toBeOnTheScreen();
     expect(receipt.getByText("+$120")).toBeOnTheScreen();
-    expect(receipt.getByText(`$${CASH + 120}`)).toBeOnTheScreen();
+    expect(receipt.getByText(`${usd(CASH + 120)}`)).toBeOnTheScreen();
     expect(receipt.getByText("Squirtle beat Onix")).toBeOnTheScreen();
   });
 });

@@ -110,3 +110,8 @@ export async function setSettings(
 ) {
   await act(() => useSettingsStore.setState(settings));
 }
+
+/** Expected on-screen dollars, written independently of `formatMoney`: 1234 → "$1,234". */
+export function usd(amount: number): string {
+  return `$${amount.toLocaleString("en-US")}`;
+}

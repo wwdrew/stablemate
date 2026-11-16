@@ -1,16 +1,5 @@
 import type { LedgerEntryType, TransactionStatus } from "@/store/game";
 
-export function formatAmount(amount: number): string {
-  const absolute = Math.abs(amount);
-  if (amount > 0) {
-    return `+$${absolute}`;
-  }
-  if (amount < 0) {
-    return `-$${absolute}`;
-  }
-  return "$0";
-}
-
 export function typeLabel(type: LedgerEntryType): string {
   switch (type) {
     case "purchase":

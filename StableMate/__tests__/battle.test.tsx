@@ -5,6 +5,7 @@ import * as battle from "@/lib/battle";
 import { useGameStore } from "@/store/game";
 import { useSettingsStore } from "@/store/settings";
 
+import { usd } from "../test/fixtures";
 import {
   renderApp,
   resetStores,
@@ -41,24 +42,24 @@ test("B1 · a win pays the prize and records the win", async () => {
   await act(() => jest.runAllTimers());
 
   expect(screen.getByText("Squirtle wins")).toBeOnTheScreen();
-  expect(screen.getByText(`Prize +$${prize}`)).toBeOnTheScreen();
+  expect(screen.getByText(`Prize +${usd(prize)}`)).toBeOnTheScreen();
   await fireEvent.press(screen.getByText("Continue"));
 
   const detail = withinScreenContaining("Base stats");
   expect(detail.getByText(/1W–0L/)).toBeOnTheScreen();
   expect(detail.getByText("$459")).toBeOnTheScreen();
   expect(detail.getByText("Round 1 · vs Onix")).toBeOnTheScreen();
-  expect(detail.getByText(`Win · +$${prize}`)).toBeOnTheScreen();
+  expect(detail.getByText(`Win · +${usd(prize)}`)).toBeOnTheScreen();
 
   const overview = withinTab("(overview)");
-  expect(overview.getByText(`$${prize}`)).toBeOnTheScreen();
-  expect(overview.getByText(`$${prize + 459}`)).toBeOnTheScreen();
+  expect(overview.getByText(`${usd(prize)}`)).toBeOnTheScreen();
+  expect(overview.getByText(`${usd(prize + 459)}`)).toBeOnTheScreen();
 
   const history = withinTab("history");
   expect(history.getByText("Battle prize")).toBeOnTheScreen();
   expect(history.getByText("Squirtle beat Onix")).toBeOnTheScreen();
-  expect(history.getByText(`+$${prize}`)).toBeOnTheScreen();
-  expect(history.getByText(`Bal $${prize}`)).toBeOnTheScreen();
+  expect(history.getByText(`+${usd(prize)}`)).toBeOnTheScreen();
+  expect(history.getByText(`Bal ${usd(prize)}`)).toBeOnTheScreen();
   expect(history.getByText("1 transaction")).toBeOnTheScreen();
 });
 

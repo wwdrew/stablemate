@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { formatMoney, formatSignedMoney } from "@/lib/money";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import type { BattleRecord } from "@/store/game";
 
@@ -57,7 +58,7 @@ export function PokemonDetailScreen({
       <Text style={styles.meta}>
         {types} · {record}
       </Text>
-      <Text style={styles.markPrice}>${pokemon.markPrice}</Text>
+      <Text style={styles.markPrice}>{formatMoney(pokemon.markPrice)}</Text>
 
       <View style={styles.stats}>
         <Text style={styles.statsHeading}>Base stats</Text>
@@ -93,7 +94,7 @@ export function PokemonDetailScreen({
                   </Text>
                   <Text style={styles.historyMeta}>
                     {battle.won ? "Win" : "Loss"}
-                    {battle.won ? ` · +$${battle.prizeMoney}` : ""}
+                    {battle.won ? ` · ${formatSignedMoney(battle.prizeMoney)}` : ""}
                   </Text>
                 </View>
                 <Text

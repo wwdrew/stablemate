@@ -2,6 +2,7 @@ import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
+import { formatMoney } from "@/lib/money";
 import { type OwnedPokemon, useStable } from "@/store/game";
 
 function StableRow({ item }: { item: OwnedPokemon }) {
@@ -36,7 +37,7 @@ function StableRow({ item }: { item: OwnedPokemon }) {
             <Text style={styles.rowPendingLabel}>{pendingLabel}</Text>
           ) : null}
         </View>
-        <Text style={styles.rowPrice}>${item.markPrice}</Text>
+        <Text style={styles.rowPrice}>{formatMoney(item.markPrice)}</Text>
       </Pressable>
     </Link>
   );

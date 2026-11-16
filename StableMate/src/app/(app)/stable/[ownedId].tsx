@@ -2,6 +2,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { formatMoney } from "@/lib/money";
 import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
 import { BattleAction } from "@/modules/active/screens/PokemonDetail/BattleAction";
 import { BattleOverlay } from "@/modules/active/screens/PokemonDetail/BattleOverlay";
@@ -30,7 +31,7 @@ function ownedStatusMessage(args: {
   }
 
   if (args.owned.pending?.type === "sale") {
-    return `Sale pending at $${args.owned.markPrice}. ${settles}`;
+    return `Sale pending at ${formatMoney(args.owned.markPrice)}. ${settles}`;
   }
 
   if (args.isLastPokemon) {

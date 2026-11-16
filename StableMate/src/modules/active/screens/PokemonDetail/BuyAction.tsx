@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { formatMoney } from "@/lib/money";
+
 type BuyActionProps = {
   price: number;
   disabled?: boolean;
@@ -32,7 +34,7 @@ export function BuyAction({
           disabled && styles.buttonDisabled,
         ]}
       >
-        <Text style={styles.buttonLabel}>Buy · ${price}</Text>
+        <Text style={styles.buttonLabel}>Buy · {formatMoney(price)}</Text>
       </Pressable>
     </View>
   );

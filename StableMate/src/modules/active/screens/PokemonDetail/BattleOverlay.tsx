@@ -12,6 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogSpecies } from "@/data/catalog.schema";
+import { formatSignedMoney } from "@/lib/money";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 
 type BattleOverlayProps = {
@@ -320,7 +321,7 @@ export function BattleOverlay({
             <Animated.View style={[styles.resultCard, resultStyle]}>
               <Text style={styles.resultTitle}>{winnerName} wins</Text>
               {playerWins ? (
-                <Text style={styles.resultPrize}>Prize +${prizeMoney}</Text>
+                <Text style={styles.resultPrize}>Prize {formatSignedMoney(prizeMoney)}</Text>
               ) : (
                 <Text style={styles.resultPrize}>No prize this round</Text>
               )}
