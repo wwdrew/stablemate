@@ -3,6 +3,7 @@ import { renderRouter } from "expo-router/testing-library";
 
 import { queryClient } from "@/api/queryClient";
 import { useGameStore } from "@/store/game";
+import { mmkv } from "@/store/mmkv";
 import { useSettingsStore } from "@/store/settings";
 
 export type TabName = "(overview)" | "history" | "stable" | "buy" | "options";
@@ -40,6 +41,8 @@ export function withinScreenContaining(text: string | RegExp) {
 }
 
 export function resetStores() {
+  // Clear persisted query cache too, or a previous test's lot is restored on mount.
+  mmkv.clearAll();
   useGameStore.setState({ state: null });
   useSettingsStore.setState({
     isOnline: true,

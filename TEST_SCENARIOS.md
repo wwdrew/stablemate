@@ -148,11 +148,11 @@ Setup for all: O4 with Squirtle.
 
 ## 3. Buying
 
-**P1 · Insufficient funds** [Both] (deterministic from a fresh game: cash $0)
+**P1 · Insufficient funds** [Both] ✅ RNTL (deterministic from a fresh game: cash $0)
 - Buy → first listing
 - Expect: `Insufficient funds — need $<price> more.`, `Buy · $<price>` disabled
 
-**P2 · Online buy settles** [Both]
+**P2 · Online buy settles** [Both] ✅ RNTL
 - Setup: `earn-cash` (RNTL: seed cash 1000); `Always settle`
 - Buy → first listing (note price `<b>`) → `Buy · $<b>`
 - Expect immediately (optimistic):
@@ -165,13 +165,13 @@ Setup for all: O4 with Squirtle.
   - Net worth = cash + Σ mark (unchanged by the buy)
 - Detail of the bought Pokémon: record is its market record; `No battles under your ownership yet.`
 
-**P3 · Offline buy queues, then settles** [Both]
+**P3 · Offline buy queues, then settles** [Both] ✅ RNTL
 - Options → Simulate network off
 - Buy a listing → detail shows `You’re offline — funds are held now and the purchase settles when you reconnect.` before buying
 - Expect: hold applied, row stays `Buying · pending` beyond 3s; History row `Pending`
 - Network on → within ~1.5s it settles as in P2
 
-**P4 · Failed buy refunds** [Both]
+**P4 · Failed buy refunds** [Both] ✅ RNTL
 - `Always fail` → buy `<name>` at `<b>`
 - Expect:
   - Alert `Purchase failed`, `Sold out before your order cleared. $<b> has been refunded.` (RNTL: spy `Alert.alert`)
@@ -181,10 +181,10 @@ Setup for all: O4 with Squirtle.
   - History, newest first: `Refund` row `Refund · <name>`, `+$<b>`, `Bal $<restored>`; then `Purchase · Failed`, amount struck through
   - Receipt for the failed purchase: Status `Failed`, Reason `Sold out before your order cleared`
 
-**P5 · Holds prevent double-spending** [RNTL]
+**P5 · Holds prevent double-spending** [RNTL] ✅ RNTL
 - Seed cash 600, two listings at 400 → buy first → second shows `Insufficient funds — need $200 more.`
 
-**P6 · Pending purchase locks the Pokémon** [Both]
+**P6 · Pending purchase locks the Pokémon** [Both] ✅ RNTL
 - Offline → buy → open it in Stable
 - Expect: `Purchase pending. Settles when you’re back online.`; Battle and Sell disabled
 
@@ -192,7 +192,7 @@ Setup for all: O4 with Squirtle.
 - Offline → buy → relaunch (no `clearState`)
 - Expect: still pending; network still off (persisted); network on → settles
 
-**P8 · Queue drains oldest first** [RNTL]
+**P8 · Queue drains oldest first** [RNTL] ✅ RNTL
 - Offline → buy A, buy B → online → advance 1500ms
 - Expect: A settled, B pending → advance 1500ms → B settled
 
@@ -200,11 +200,11 @@ Setup for all: O4 with Squirtle.
 
 ## 4. Selling
 
-**S1 · Can't sell your last Pokémon** [Both] (deterministic from a fresh game)
+**S1 · Can't sell your last Pokémon** [Both] ✅ RNTL (deterministic from a fresh game)
 - Stable → starter
 - Expect: `You can’t sell your last Pokémon.`, `Sell · $433` disabled
 
-**S2 · Online sale settles** [Both]
+**S2 · Online sale settles** [Both] ✅ RNTL
 - Setup: P2 done (2 Pokémon); `Always settle`
 - Stable → bought Pokémon (mark `<m>`) → `Sell · $<m>`
 - Expect immediately:
@@ -220,10 +220,10 @@ Setup for all: O4 with Squirtle.
   - Net worth unchanged from before the sale (asset swapped for cash)
   - Chart gains a step up
 
-**S3 · Offline sale queues** [Both]
+**S3 · Offline sale queues** [Both] ✅ RNTL
 - Network off → sell → row pending beyond 3s, detail shows `Sale pending at $<m>. Settles when you’re back online.` → network on → settles as S2
 
-**S4 · Failed sale rolls back** [Both]
+**S4 · Failed sale rolls back** [Both] ✅ RNTL
 - `Always fail` → sell
 - Expect:
   - Alert `Sale failed`, `No buyers at your price. <name> is back in your stable.`
@@ -231,11 +231,11 @@ Setup for all: O4 with Squirtle.
   - History: `Sale · Failed`, struck-through amount, no balance
   - Receipt: Reason `No buyers at your price`, Balance after `Not credited`
 
-**S5 · Pending sale counts as gone for the last-Pokémon rule** [Both]
+**S5 · Pending sale counts as gone for the last-Pokémon rule** [Both] ✅ RNTL
 - Two Pokémon, offline → sell A → open B
 - Expect: `You can’t sell your last Pokémon.`; Sell disabled
 
-**S6 · Pending sale locks battling** [Both]
+**S6 · Pending sale locks battling** [Both] ✅ RNTL
 - Offline → sell A → open A
 - Expect: Battle and Sell disabled
 
@@ -243,12 +243,12 @@ Setup for all: O4 with Squirtle.
 
 ## 5. History and ledger
 
-**H1 · Ordering** [RNTL] (fiddly in E2E)
+**H1 · Ordering** [RNTL] ✅ RNTL (fiddly in E2E)
 - Script: win (prize) → offline buy (pending) → sell (pending) → online → settle all
 - Expect while pending: pending rows first, then posted rows newest-first
 - After settling: settled sale moves to the top (posting order), purchase stays where it was posted
 
-**H2 · Running-balance invariant (V8)** [RNTL]
+**H2 · Running-balance invariant (V8)** [RNTL] ✅ RNTL
 - Run any mixed sequence of P/S/B actions
 - Walking the ledger oldest → newest over posted entries (`balanceAfter !== null`), each `balanceAfter` = previous + `amount`
 - The newest posted `balanceAfter` = cash
@@ -256,11 +256,11 @@ Setup for all: O4 with Squirtle.
 **H3 · Balance card** [Both]
 - After each scenario above: `Current balance` = Overview cash; `N transaction(s)` = row count, with correct singular/plural
 
-**H4 · Receipt per type** [Both]
+**H4 · Receipt per type** [Both] ✅ RNTL
 - Open one row each of Prize / Purchase / Sale / Refund
 - Expect: title, signed amount, subtitle, Type, Status, Round, Reference (= ledger id), and Settled / Failed timestamp present for non-pending entries
 
-**H5 · Receipt for a vanished entry** [RNTL]
+**H5 · Receipt for a vanished entry** [RNTL] ✅ RNTL
 - `renderRouter` at `/history/missing` → `Transaction not found`
 
 ---
