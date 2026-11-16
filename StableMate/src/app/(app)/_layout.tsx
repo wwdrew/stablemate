@@ -7,7 +7,7 @@ export default function AppTabsLayout() {
 
   return (
     <NativeTabs>
-      <NativeTabs.Trigger name="index">
+      <NativeTabs.Trigger name="(overview)">
         <NativeTabs.Trigger.Label>Overview</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{ default: "chart.bar", selected: "chart.bar.fill" }}

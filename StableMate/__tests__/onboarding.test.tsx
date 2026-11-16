@@ -50,7 +50,7 @@ test.each([
     await fireEvent.press(screen.getByText("Start training"));
 
     expect(await screen.findByText("Starter")).toBeOnTheScreen();
-    const overview = withinTab("index");
+    const overview = withinTab("(overview)");
     expect(overview.getByText(name)).toBeOnTheScreen();
     expect(overview.getByText(type)).toBeOnTheScreen();
     expect(overview.getByText("$0")).toBeOnTheScreen();
@@ -79,6 +79,6 @@ test("O5 · changing the selection before confirming uses the last pick", async 
   await fireEvent.press(screen.getByText("Start training"));
 
   expect(await screen.findByText("Starter")).toBeOnTheScreen();
-  expect(withinTab("index").getByText("Charmander")).toBeOnTheScreen();
+  expect(withinTab("(overview)").getByText("Charmander")).toBeOnTheScreen();
   expect(screen.queryByText("Bulbasaur")).not.toBeOnTheScreen();
 });

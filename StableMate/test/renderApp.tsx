@@ -5,7 +5,7 @@ import { queryClient } from "@/api/queryClient";
 import { useGameStore } from "@/store/game";
 import { useSettingsStore } from "@/store/settings";
 
-export type TabName = "index" | "history" | "stable" | "buy" | "options";
+export type TabName = "(overview)" | "history" | "stable" | "buy" | "options";
 
 /** Renders the real file-based app from `src/app`. */
 export function renderApp(initialUrl = "/") {

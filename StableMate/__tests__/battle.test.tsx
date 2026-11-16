@@ -50,7 +50,7 @@ test("B1 · a win pays the prize and records the win", async () => {
   expect(detail.getByText("Round 1 · vs Onix")).toBeOnTheScreen();
   expect(detail.getByText(`Win · +$${prize}`)).toBeOnTheScreen();
 
-  const overview = withinTab("index");
+  const overview = withinTab("(overview)");
   expect(overview.getByText(`$${prize}`)).toBeOnTheScreen();
   expect(overview.getByText(`$${prize + 459}`)).toBeOnTheScreen();
 
@@ -74,7 +74,7 @@ test("B2 · a loss pays nothing and records the loss", async () => {
   expect(detail.getByText("Round 1 · vs Onix")).toBeOnTheScreen();
   expect(detail.getByText("Loss")).toBeOnTheScreen();
 
-  const overview = withinTab("index");
+  const overview = withinTab("(overview)");
   expect(overview.getByText("$0")).toBeOnTheScreen();
   expect(overview.getByText("$407")).toBeOnTheScreen();
   expect(withinTab("history").getByText("No transactions yet")).toBeOnTheScreen();
