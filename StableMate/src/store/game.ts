@@ -585,7 +585,21 @@ export const useRoundsPlayed = () =>
 
 export const useCash = () => useGameStore((store) => store.state?.cash ?? 0);
 
+// Selectors must return a stable reference when state is null, or
+// useSyncExternalStore sees a new value every render and loops.
 const EMPTY_LEDGER: LedgerEntry[] = [];
+const EMPTY_STABLE: OwnedPokemon[] = [];
+const EMPTY_BATTLE_HISTORY: BattleRecord[] = [];
+const EMPTY_LISTING_IDS: string[] = [];
+
+export const useStable = () =>
+  useGameStore((store) => store.state?.stable ?? EMPTY_STABLE);
+
+export const useBattleHistory = () =>
+  useGameStore((store) => store.state?.battleHistory ?? EMPTY_BATTLE_HISTORY);
+
+export const usePurchasedListingIds = () =>
+  useGameStore((store) => store.state?.purchasedListingIds ?? EMPTY_LISTING_IDS);
 
 export const useLedger = () =>
   useGameStore((store) => store.state?.ledger ?? EMPTY_LEDGER);

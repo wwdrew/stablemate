@@ -8,7 +8,12 @@ import { BattleOverlay } from "@/modules/active/screens/PokemonDetail/BattleOver
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromOwned } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { SellAction } from "@/modules/active/screens/PokemonDetail/SellAction";
-import { type BattleResult, type OwnedPokemon, useGameStore } from "@/store/game";
+import {
+  type BattleResult,
+  type OwnedPokemon,
+  useBattleHistory,
+  useGameStore,
+} from "@/store/game";
 import { useBattleOutcome, useIsOnline } from "@/store/settings";
 
 function ownedStatusMessage(args: {
@@ -41,7 +46,7 @@ export default function StableOwnedDetailRoute() {
   const owned = useGameStore((store) =>
     store.state?.stable.find((item) => item.id === ownedId),
   );
-  const battleHistory = useGameStore((store) => store.state?.battleHistory ?? []);
+  const battleHistory = useBattleHistory();
   const startBattle = useGameStore((store) => store.startBattle);
   const sellOwned = useGameStore((store) => store.sellOwned);
   const keepingCount = useGameStore(

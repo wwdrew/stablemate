@@ -1,13 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { generateMarketLot, marketLotQueryKey } from "@/api/marketLot";
-import { useGameStore, useRoundsPlayed } from "@/store/game";
+import { usePurchasedListingIds, useRoundsPlayed } from "@/store/game";
 
 export function useMarketLot() {
   const roundsPlayed = useRoundsPlayed();
-  const purchasedListingIds = useGameStore(
-    (store) => store.state?.purchasedListingIds ?? [],
-  );
+  const purchasedListingIds = usePurchasedListingIds();
 
   const query = useQuery({
     queryKey: marketLotQueryKey(roundsPlayed),

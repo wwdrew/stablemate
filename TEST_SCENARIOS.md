@@ -287,12 +287,12 @@ Setup for all: O4 with Squirtle.
 - Network off, `Always win`, `Always fail` → relaunch
 - Expect: network still off; Battle and Settlement outcome back to `Random`
 
-**OP2 · Reset game** [Both]
+**OP2 · Reset game** [Both] ✅ RNTL
 - Mid-game (with pending transactions) → `Reset game`
 - Expect:
   - Onboarding `StableMate` slide; picking a starter starts fresh at Cash `$0`
   - Network setting kept
-- Also guards known bug B2 (fresh `[]` selectors while tabs are mounted). Watch for `getSnapshot should be cached` / render-loop errors
+- Also asserts no `console.error`. Null-state selectors are covered separately in `selectors.test.tsx`
 
 ---
 

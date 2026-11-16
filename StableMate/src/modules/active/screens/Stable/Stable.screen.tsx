@@ -2,7 +2,7 @@ import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
-import { type OwnedPokemon, useGameStore } from "@/store/game";
+import { type OwnedPokemon, useStable } from "@/store/game";
 
 function StableRow({ item }: { item: OwnedPokemon }) {
   const species = getSpeciesBySlug(item.speciesId);
@@ -43,7 +43,7 @@ function StableRow({ item }: { item: OwnedPokemon }) {
 }
 
 export function StableScreen() {
-  const stable = useGameStore((store) => store.state?.stable ?? []);
+  const stable = useStable();
 
   return (
     <FlatList
