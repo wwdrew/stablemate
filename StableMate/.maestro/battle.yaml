@@ -22,7 +22,10 @@ tags: [smoke]
 - copyTextFrom: "Prize \\+\\$\\d+"
 - evalScript: ${output.prize = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}
 - tapOn: "Continue"
-- assertVisible: "Water · 1W–0L"
+# Scroll back up to the record; Android's detail is a full page, so it may be off screen.
+- scrollUntilVisible:
+    element: "Water · 1W–0L"
+    direction: UP
 - assertVisible: "\\$459"
 - assertVisible: "Win · \\+\\$${output.prize}"
 - runFlow: subflows/close-modal.yaml
@@ -48,7 +51,10 @@ tags: [smoke]
     timeout: 15000
 - assertVisible: "No prize this round"
 - tapOn: "Continue"
-- assertVisible: "Water · 1W–1L"
+# Scroll back up to the record; Android's detail is a full page, so it may be off screen.
+- scrollUntilVisible:
+    element: "Water · 1W–1L"
+    direction: UP
 - assertVisible: "\\$433"
 - runFlow: subflows/close-modal.yaml
 
@@ -60,6 +66,10 @@ tags: [smoke]
 - tapOn: "Battle"
 - stopApp
 - launchApp
+# Android's dev build reloads the bundle on relaunch; wait for the tab bar.
+- extendedWaitUntil:
+    visible: "Stable"
+    timeout: 90000
 - tapOn: "Stable"
 - extendedWaitUntil:
     visible: "Squirtle, Water · 1W–2L, .*"

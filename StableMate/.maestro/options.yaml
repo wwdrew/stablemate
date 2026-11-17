@@ -24,7 +24,7 @@ tags: [smoke]
 - launchApp
 - extendedWaitUntil:
     visible: "Wallet and stable at a glance.*"
-    timeout: 30000
+    timeout: 90000
 - tapOn: "Options"
 - assertVisible: "Offline — buys and sales queue until you go online."
 - assertNotVisible:

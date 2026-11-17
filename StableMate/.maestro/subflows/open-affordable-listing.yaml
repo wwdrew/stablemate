@@ -6,6 +6,9 @@ appId: com.wwdrew.StableMate
 - tapOn:
     text: ".* · [0-9]+W–[0-9]+L, \\$.*"
     index: 0
+# The buy button (and any "Insufficient funds" note above it) can sit below the fold.
+- scrollUntilVisible:
+    element: "Buy · .*"
 - repeat:
     while:
       visible: "Insufficient funds.*"
@@ -16,5 +19,7 @@ appId: com.wwdrew.StableMate
       - tapOn:
           text: ".* · [0-9]+W–[0-9]+L, \\$.*"
           index: 0
+      - scrollUntilVisible:
+          element: "Buy · .*"
 - copyTextFrom: "Buy · \\$.*"
 - evalScript: ${output.price = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}

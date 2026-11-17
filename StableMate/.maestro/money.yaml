@@ -44,6 +44,10 @@ tags: [money]
 - assertVisible: "PURCHASE · PENDING, Bought .*, -\\$${output.price}, Bal .*"
 - stopApp
 - launchApp
+# Android's dev build reloads the bundle on relaunch; wait for the tab bar.
+- extendedWaitUntil:
+    visible: "Stable"
+    timeout: 90000
 - tapOn: "Stable"
 - extendedWaitUntil:
     visible: ".*BUYING · PENDING.*"

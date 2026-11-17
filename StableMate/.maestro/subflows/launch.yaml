@@ -1,18 +1,30 @@
 # Fresh install, connected to the local Metro server (dev build).
+# Android needs `adb reverse tcp:8081 tcp:8081` so the emulator can reach Metro.
 appId: com.wwdrew.StableMate
 ---
 - launchApp:
     clearState: true
 - openLink: exp+stablemate://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081
 - extendedWaitUntil:
-    visible: "This is the developer menu.*|Next"
+    visible: "This is the developer menu.*|Next|New development server"
     timeout: 60000
+# The link can arrive before the dev launcher is ready; send it again.
+- runFlow:
+    when:
+      visible: "New development server"
+    commands:
+      - openLink: exp+stablemate://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081
+      - extendedWaitUntil:
+          visible: "This is the developer menu.*|Next"
+          timeout: 60000
 - runFlow:
     when:
       visible: "This is the developer menu.*"
     commands:
       - tapOn: "Continue"
-      - tapOn: "Close"
+      - tapOn:
+          text: "Close"
+          optional: true
 - extendedWaitUntil:
     visible: "Next"
     timeout: 30000

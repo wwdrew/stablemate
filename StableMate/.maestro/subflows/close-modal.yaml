@@ -1,7 +1,17 @@
-# Swipe a detail modal down to dismiss it.
+# Dismiss a detail modal: swipe it down on iOS; Android shows it as a full
+# screen, so go back.
 appId: com.wwdrew.StableMate
 ---
-- swipe:
-    start: 50%, 12%
-    end: 50%, 90%
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 50%, 12%
+          end: 50%, 90%
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
 - waitForAnimationToEnd

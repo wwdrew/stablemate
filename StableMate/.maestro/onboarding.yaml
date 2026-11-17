@@ -35,5 +35,5 @@ tags: [smoke]
 - launchApp
 - extendedWaitUntil:
     visible: "Win a prize or trade to start the chart."
-    timeout: 30000
+    timeout: 90000
 - assertNotVisible: "Choose your starter"

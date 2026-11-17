@@ -63,12 +63,12 @@ flowchart LR
 cd StableMate
 npm test        # full suite, a few seconds
 npm run lint    # ESLint: Expo config, including React Compiler rules
-npm run e2e     # Maestro, against the dev build on a booted simulator, with Metro running
+npm run e2e     # Maestro, against the dev build on a booted simulator or emulator, with Metro running
 npx tsc --noEmit
 ```
 
 - **Integration (RNTL).** These render the **real** file-based app via `expo-router/testing-library`, deep-link to a screen, and drive it with presses. They cover onboarding, battles, buying, selling, the offline queue, failures and refunds, History ordering, running balances and receipts. Randomness is pinned by seeding the market and game state ([`test/fixtures.ts`](StableMate/test/fixtures.ts)) or by spying on the challenger picker, and settlement runs on fake timers.
-- **E2E (Maestro).** Four flows in [`.maestro/`](StableMate/.maestro) drive the real app on a simulator: onboarding and relaunch, wins and losses (including a force-quit mid-battle), a refunded purchase, an offline purchase that survives a relaunch and settles on reconnect, failed and offline sales, and which settings persist. They use the Options overrides for determinism, with no mocks.
+- **E2E (Maestro).** Four flows in [`.maestro/`](StableMate/.maestro) drive the real app on the iOS simulator and the Android emulator: onboarding and relaunch, wins and losses (including a force-quit mid-battle), a refunded purchase, an offline purchase that survives a relaunch and settles on reconnect, failed and offline sales, and which settings persist. They use the Options overrides for determinism, with no mocks. On Android, run `adb reverse tcp:8081 tcp:8081` first so the emulator can reach Metro.
 - **Store logic.** [`store.test.ts`](StableMate/__tests__/store.test.ts) exercises holds, refunds, sale posting order, rollback and idempotency directly.
 - **The tests can fail.** I checked by introducing bugs (no sale credit, no refund, settling while offline); each one broke between 2 and 5 tests.
 - **Scenarios.** [`TEST_SCENARIOS.md`](TEST_SCENARIOS.md) lists every scenario, tagged for RNTL, Maestro or both, with ✅ against those that are automated.
@@ -95,10 +95,10 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 ## Known limitations
 
 - **Money is whole dollars.** Amounts are integers, but not minor units (cents). Display goes through one `formatMoney` helper (`Intl.NumberFormat`), so moving to cents is a store change, not a UI one.
-- **No CI yet**, and the Maestro flows have only been run on iOS.
+- **No CI yet.** Everything runs locally.
 
 ## What I'd build next
 
 - **Pay in 4.** Split a purchase into instalments debited over the next rounds, with a missed-payment path when funds are short. It reuses holds, pending entries, the queue and the receipt.
-- CI running typecheck, lint and tests, plus Maestro on both platforms.
+- CI running typecheck, lint, tests and both Maestro platforms.
 - Integer minor units (cents).

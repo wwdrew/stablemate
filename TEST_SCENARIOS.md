@@ -51,7 +51,9 @@ The harness lives in `StableMate/` and runs with `npm test`:
 
 ### Maestro flows
 
-Flows live in `StableMate/.maestro/` and run against the dev build on a booted simulator with Metro running (`npm run e2e`). Each flow starts from a fresh install.
+Flows live in `StableMate/.maestro/` and run against the dev build with Metro running (`npm run e2e`), on the iOS simulator and the Android emulator (pass `--device` when both are up; on Android run `adb reverse tcp:8081 tcp:8081` first). Each flow starts from a fresh install.
+
+Android differences the flows handle: detail screens are full pages (close with `back`, and scroll to off-screen content), the dev launcher can miss the first deep link, and a relaunch reloads the bundle, so waits after `launchApp` allow 90s.
 
 | Flow | Covers |
 |---|---|
