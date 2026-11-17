@@ -5,8 +5,10 @@ import { getSpeciesBySlug } from "@/data/catalog";
 import { formatMoney } from "@/lib/money";
 import { formatTypes } from "@/lib/pokemon";
 import { type OwnedPokemon, useStable } from "@/store/game";
+import { makeStyles } from "@/theme/colors";
 
 function StableRow({ item }: { item: OwnedPokemon }) {
+  const styles = useStyles();
   const species = getSpeciesBySlug(item.speciesId);
   const record = `${item.wins}W–${item.losses}L`;
   const pendingLabel =
@@ -45,6 +47,7 @@ function StableRow({ item }: { item: OwnedPokemon }) {
 }
 
 export function StableScreen() {
+  const styles = useStyles();
   const stable = useStable();
 
   return (
@@ -75,10 +78,10 @@ export function StableScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   list: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   listContent: {
     paddingHorizontal: 20,
@@ -87,12 +90,12 @@ const styles = StyleSheet.create({
   subtitle: {
     marginBottom: 16,
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   row: {
-    backgroundColor: "#FFFCF7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
+    borderColor: colors.separator,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -100,14 +103,14 @@ const styles = StyleSheet.create({
   },
   rowPending: {
     borderStyle: "dashed",
-    borderColor: "#A8A29E",
+    borderColor: colors.textTertiary,
   },
   rowPendingLabel: {
     fontSize: 12,
     fontWeight: "600",
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: "#B45309",
+    color: colors.pending,
   },
   rowCopy: {
     flex: 1,
@@ -116,35 +119,35 @@ const styles = StyleSheet.create({
   rowName: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   rowMeta: {
     fontSize: 13,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   rowPrice: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#1C1917",
+    color: colors.text,
   },
   separator: {
     height: 10,
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 20,
     gap: 8,
   },
   emptyTitle: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   emptyBody: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#57534E",
+    color: colors.textSecondary,
   },
-});
+}));

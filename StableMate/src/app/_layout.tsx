@@ -1,13 +1,19 @@
-import { Stack } from "expo-router";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
+import { useColorScheme } from "react-native";
 
 import { QueryProvider } from "@/providers/QueryProvider";
 import { useHasGameState } from "@/store/game";
 
 export default function RootLayout() {
+  // Navigation chrome (headers, modal backgrounds) follows the system scheme.
+  const scheme = useColorScheme();
+
   return (
-    <QueryProvider>
-      <RootNavigator />
-    </QueryProvider>
+    <ThemeProvider value={scheme === "dark" ? DarkTheme : DefaultTheme}>
+      <QueryProvider>
+        <RootNavigator />
+      </QueryProvider>
+    </ThemeProvider>
   );
 }
 

@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { useMarketLot } from "@/api/useMarketLot";
 import { formatMoney } from "@/lib/money";
@@ -10,6 +10,7 @@ import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/Poke
 import { pokemonFromListing } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { useCash, useGameStore } from "@/store/game";
 import { useIsOnline } from "@/store/settings";
+import { makeStyles, useColors } from "@/theme/colors";
 
 function failureReasonMessage(
   reason: "insufficient_funds" | "already_purchased" | "no_state",
@@ -65,6 +66,8 @@ function purchaseStatusMessage(args: {
 }
 
 export default function BuyListingDetailRoute() {
+  const colors = useColors();
+  const styles = useStyles();
   const router = useRouter();
   const { listingId } = useLocalSearchParams<{ listingId: string }>();
   const { data: listings = [], isPending } = useMarketLot();
@@ -81,7 +84,7 @@ export default function BuyListingDetailRoute() {
   if (isPending) {
     return (
       <>
-        <Stack.Screen options={detailScreenHeaderOptions("Loading")} />
+        <Stack.Screen options={detailScreenHeaderOptions("Loading", colors)} />
         <View style={styles.centered}>
           <Text style={styles.body}>Loading…</Text>
         </View>
@@ -92,7 +95,7 @@ export default function BuyListingDetailRoute() {
   if (!pokemon || !listing) {
     return (
       <>
-        <Stack.Screen options={detailScreenHeaderOptions("Not found")} />
+        <Stack.Screen options={detailScreenHeaderOptions("Not found", colors)} />
         <View style={styles.centered}>
           <Text style={styles.title}>Listing unavailable</Text>
           <Text style={styles.body}>
@@ -113,7 +116,7 @@ export default function BuyListingDetailRoute() {
 
   return (
     <>
-      <Stack.Screen options={detailScreenHeaderOptions(pokemon.name)} />
+      <Stack.Screen options={detailScreenHeaderOptions(pokemon.name, colors)} />
       <PokemonDetailScreen
         pokemon={pokemon}
         actions={
@@ -149,22 +152,22 @@ export default function BuyListingDetailRoute() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   centered: {
     flex: 1,
     justifyContent: "center",
     padding: 24,
     gap: 8,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   body: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#57534E",
+    color: colors.textSecondary,
   },
-});
+}));

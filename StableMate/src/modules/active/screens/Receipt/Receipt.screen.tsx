@@ -1,9 +1,10 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { settlementFailureMessage } from "@/api/settlement";
 import { typeLabel } from "@/lib/ledger";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import type { LedgerEntry, TransactionStatus } from "@/store/game";
+import { makeStyles } from "@/theme/colors";
 
 type ReceiptScreenProps = {
   entry: LedgerEntry | undefined;
@@ -30,6 +31,7 @@ function balanceCopy(entry: LedgerEntry): string {
 }
 
 export function ReceiptScreen({ entry }: ReceiptScreenProps) {
+  const styles = useStyles();
   if (!entry) {
     return (
       <View style={styles.centered}>
@@ -88,10 +90,10 @@ export function ReceiptScreen({ entry }: ReceiptScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   scroll: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   content: {
     paddingHorizontal: 20,
@@ -106,25 +108,25 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   heroAmount: {
     fontSize: 36,
     fontWeight: "700",
-    color: "#1C1917",
+    color: colors.text,
   },
   heroAmountFailed: {
-    color: "#A8A29E",
+    color: colors.textTertiary,
     textDecorationLine: "line-through",
   },
   heroSubtitle: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   card: {
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 16,
     gap: 12,
   },
@@ -135,13 +137,13 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   rowValue: {
     flexShrink: 1,
     fontSize: 15,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
     textAlign: "right",
   },
   centered: {
@@ -149,16 +151,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
     gap: 8,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   body: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#57534E",
+    color: colors.textSecondary,
   },
-});
+}));

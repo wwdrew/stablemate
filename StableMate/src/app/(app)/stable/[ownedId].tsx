@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { formatMoney } from "@/lib/money";
 import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
@@ -16,6 +16,7 @@ import {
   useGameStore,
 } from "@/store/game";
 import { useBattleOutcome, useIsOnline } from "@/store/settings";
+import { makeStyles, useColors } from "@/theme/colors";
 
 function ownedStatusMessage(args: {
   owned: OwnedPokemon;
@@ -42,6 +43,8 @@ function ownedStatusMessage(args: {
 }
 
 export default function StableOwnedDetailRoute() {
+  const colors = useColors();
+  const styles = useStyles();
   const router = useRouter();
   const { ownedId } = useLocalSearchParams<{ ownedId: string }>();
   const owned = useGameStore((store) =>
@@ -68,7 +71,7 @@ export default function StableOwnedDetailRoute() {
   if (!pokemon || !owned) {
     return (
       <>
-        <Stack.Screen options={detailScreenHeaderOptions("Not found")} />
+        <Stack.Screen options={detailScreenHeaderOptions("Not found", colors)} />
         <View style={styles.centered}>
           <Text style={styles.title}>Pokémon not found</Text>
           <Text style={styles.body}>
@@ -85,7 +88,7 @@ export default function StableOwnedDetailRoute() {
 
   return (
     <>
-      <Stack.Screen options={detailScreenHeaderOptions(pokemon.name)} />
+      <Stack.Screen options={detailScreenHeaderOptions(pokemon.name, colors)} />
       <PokemonDetailScreen
         pokemon={pokemon}
         battleHistory={ownedBattleHistory}
@@ -122,7 +125,7 @@ export default function StableOwnedDetailRoute() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   actions: {
     gap: 12,
   },
@@ -131,16 +134,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
     gap: 8,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   body: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#57534E",
+    color: colors.textSecondary,
   },
-});
+}));

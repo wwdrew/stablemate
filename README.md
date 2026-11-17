@@ -54,6 +54,7 @@ flowchart LR
 - **No backend.** The "exchange" is [`decideSettlement`](StableMate/src/api/settlement.ts): a delay, a failure rate (10% for purchases, 20% for sales) and an override. It behaves enough like a remote service to make optimistic UI meaningful, and a real API could slot in behind the same function.
 - **Holds, not fully optimistic.** Letting both buys and sells move cash immediately would be simpler, but it lets you spend money that might never arrive and can push the balance negative. Holds match how card payments actually work.
 - **Determinism through the app, not around it.** The demo overrides double as E2E test controls, so Maestro can force wins, losses and failures without mocks or a test server.
+- **Native colours, not a hand-rolled dark mode.** [`src/theme/colors.ts`](StableMate/src/theme/colors.ts) maps a dozen semantic tokens to iOS system colours and Android Material 3 dynamic colours, so dark mode, increased contrast and wallpaper colours come from the OS. Android resolves those colours when they're read, so styles come from a `makeStyles` hook that rebuilds them when the scheme changes.
 - **Text-first tests.** Integration tests assert on what the user reads, not testIDs, so they also check the copy.
 
 ## Testing
@@ -94,7 +95,6 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 ## Known limitations
 
 - **Money is whole dollars.** Amounts are integers, but not minor units (cents). Display goes through one `formatMoney` helper (`Intl.NumberFormat`), so moving to cents is a store change, not a UI one.
-- **Light mode only.** Colours are hard-coded rather than themed.
 - **The chart is drawn with Views.** This avoids a native dependency and a dev-client rebuild; it should move to SVG.
 - **No CI yet**, and the Maestro flows have only been run on iOS.
 
@@ -102,5 +102,5 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 
 - **Pay in 4.** Split a purchase into instalments debited over the next rounds, with a missed-payment path when funds are short. It reuses holds, pending entries, the queue and the receipt.
 - CI running typecheck, lint and tests, plus Maestro on both platforms.
-- Integer minor units (cents), theme tokens with dark mode, and the SVG chart.
+- Integer minor units (cents), and the SVG chart.
 - Filters on History for open, closed and failed transactions, and a settlement timeline on the receipt.

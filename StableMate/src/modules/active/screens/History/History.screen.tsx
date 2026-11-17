@@ -11,8 +11,10 @@ import {
   useLedger,
   usePendingCredits,
 } from "@/store/game";
+import { makeStyles } from "@/theme/colors";
 
 function TransactionRow({ item }: { item: LedgerEntry }) {
+  const styles = useStyles();
   const positive = item.amount > 0;
   const status = statusLabel(item.status);
 
@@ -67,6 +69,7 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
 }
 
 export function HistoryScreen() {
+  const styles = useStyles();
   const ledger = useLedger();
   const cash = useCash();
   const pendingCredits = usePendingCredits();
@@ -125,10 +128,10 @@ export function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   list: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   listContent: {
     paddingHorizontal: 20,
@@ -141,12 +144,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   balanceCard: {
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 16,
     gap: 4,
   },
@@ -154,26 +157,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: "#A8A29E",
+    color: colors.textTertiary,
   },
   balanceValue: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#1C1917",
+    color: colors.text,
   },
   balancePending: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#B45309",
+    color: colors.pending,
   },
   balanceMeta: {
     fontSize: 13,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   row: {
-    backgroundColor: "#FFFCF7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
+    borderColor: colors.separator,
     padding: 16,
     flexDirection: "row",
     alignItems: "flex-start",
@@ -181,13 +184,13 @@ const styles = StyleSheet.create({
   },
   rowPending: {
     borderStyle: "dashed",
-    borderColor: "#A8A29E",
+    borderColor: colors.textTertiary,
   },
   statusPending: {
-    color: "#B45309",
+    color: colors.pending,
   },
   statusFailed: {
-    color: "#B91C1C",
+    color: colors.negative,
   },
   rowCopy: {
     flex: 1,
@@ -197,17 +200,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.7,
     textTransform: "uppercase",
-    color: "#A8A29E",
+    color: colors.textTertiary,
     fontWeight: "600",
   },
   rowTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   rowSubtitle: {
     fontSize: 13,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   amounts: {
     alignItems: "flex-end",
@@ -218,40 +221,40 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   amountIn: {
-    color: "#15803D",
+    color: colors.positive,
   },
   amountOut: {
-    color: "#1C1917",
+    color: colors.text,
   },
   amountPending: {
-    color: "#A8A29E",
+    color: colors.textTertiary,
   },
   amountFailed: {
-    color: "#A8A29E",
+    color: colors.textTertiary,
     textDecorationLine: "line-through",
   },
   balance: {
     fontSize: 12,
-    color: "#A8A29E",
+    color: colors.textTertiary,
   },
   separator: {
     height: 10,
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 20,
     gap: 8,
   },
   emptyTitle: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   emptyBody: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#57534E",
+    color: colors.textSecondary,
   },
-});
+}));

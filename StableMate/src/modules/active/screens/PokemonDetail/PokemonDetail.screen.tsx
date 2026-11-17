@@ -1,11 +1,12 @@
 import { Image } from "expo-image";
 import type { ReactNode } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import { formatTypes } from "@/lib/pokemon";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import type { BattleRecord } from "@/store/game";
+import { makeStyles } from "@/theme/colors";
 
 type PokemonDetailScreenProps = {
   pokemon: PokemonInstance;
@@ -30,6 +31,7 @@ export function PokemonDetailScreen({
   battleHistory,
   actions,
 }: PokemonDetailScreenProps) {
+  const styles = useStyles();
   const artwork = pokemon.sprites.artwork ?? pokemon.sprites.default;
   const types = formatTypes(pokemon.types);
   const record = `${pokemon.wins}W–${pokemon.losses}L`;
@@ -117,10 +119,10 @@ export function PokemonDetailScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   scroll: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   content: {
     paddingHorizontal: 20,
@@ -141,39 +143,39 @@ const styles = StyleSheet.create({
     height: 220,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E7E5E4",
+    backgroundColor: colors.separator,
   },
   artworkFallbackLabel: {
-    color: "#78716C",
+    color: colors.textSecondary,
     fontSize: 15,
   },
   name: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#1C1917",
+    color: colors.text,
   },
   meta: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   markPrice: {
     marginTop: 4,
     fontSize: 20,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   stats: {
     marginTop: 20,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 16,
     gap: 10,
   },
   statsHeading: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
     marginBottom: 4,
   },
   statRow: {
@@ -183,30 +185,30 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   statValue: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   history: {
     marginTop: 20,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 16,
     gap: 12,
   },
   historyHint: {
     fontSize: 13,
     lineHeight: 18,
-    color: "#78716C",
+    color: colors.textSecondary,
     marginTop: -4,
   },
   historyEmpty: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   historyRow: {
     flexDirection: "row",
@@ -220,23 +222,23 @@ const styles = StyleSheet.create({
   historyTitle: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   historyMeta: {
     fontSize: 13,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   historyResult: {
     fontSize: 17,
     fontWeight: "700",
   },
   historyWin: {
-    color: "#15803D",
+    color: colors.positive,
   },
   historyLoss: {
-    color: "#B91C1C",
+    color: colors.negative,
   },
   actions: {
     marginTop: 24,
   },
-});
+}));

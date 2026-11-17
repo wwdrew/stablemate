@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { formatMoney } from "@/lib/money";
+import { makeStyles } from "@/theme/colors";
 
 type SellActionProps = {
   price: number;
@@ -15,6 +16,7 @@ export function SellAction({
   statusMessage = null,
   onPress,
 }: SellActionProps) {
+  const styles = useStyles();
   return (
     <View style={styles.wrap}>
       <Pressable
@@ -36,19 +38,19 @@ export function SellAction({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   wrap: {
     gap: 10,
   },
   status: {
     fontSize: 14,
-    color: "#57534E",
+    color: colors.textSecondary,
     textAlign: "center",
   },
   button: {
     borderWidth: 1,
-    borderColor: "#1C1917",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.accent,
+    backgroundColor: colors.surface,
     paddingVertical: 14,
     alignItems: "center",
   },
@@ -59,8 +61,8 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   buttonLabel: {
-    color: "#1C1917",
+    color: colors.text,
     fontSize: 17,
     fontWeight: "600",
   },
-});
+}));

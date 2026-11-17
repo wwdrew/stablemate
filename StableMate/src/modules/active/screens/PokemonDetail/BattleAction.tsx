@@ -1,4 +1,6 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, Text } from "react-native";
+
+import { makeStyles } from "@/theme/colors";
 
 type BattleActionProps = {
   onPress: () => void;
@@ -6,6 +8,7 @@ type BattleActionProps = {
 };
 
 export function BattleAction({ onPress, disabled = false }: BattleActionProps) {
+  const styles = useStyles();
   return (
     <Pressable
       accessibilityRole="button"
@@ -22,9 +25,9 @@ export function BattleAction({ onPress, disabled = false }: BattleActionProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   button: {
-    backgroundColor: "#1C1917",
+    backgroundColor: colors.accent,
     paddingVertical: 14,
     alignItems: "center",
   },
@@ -35,8 +38,8 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   buttonLabel: {
-    color: "#FFFCF7",
+    color: colors.onAccent,
     fontSize: 17,
     fontWeight: "600",
   },
-});
+}));

@@ -1,14 +1,16 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import { useGameStore, useNetWorth, usePendingCredits } from "@/store/game";
+import { makeStyles } from "@/theme/colors";
 
 import { CashChart } from "./CashChart";
 import { CashDisplay } from "./CashDisplay";
 import { RoundsDisplay } from "./RoundsDisplay";
 
 export function OverviewScreen() {
+  const styles = useStyles();
   const state = useGameStore((store) => store.state);
   const netWorth = useNetWorth();
   const pendingCredits = usePendingCredits();
@@ -57,10 +59,10 @@ export function OverviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   content: {
     paddingHorizontal: 20,
@@ -69,13 +71,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   card: {
-    backgroundColor: "#FFFCF7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
+    borderColor: colors.separator,
     padding: 16,
     gap: 4,
   },
@@ -83,19 +85,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: "#A8A29E",
+    color: colors.textTertiary,
   },
   value: {
     fontSize: 22,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   meta: {
     fontSize: 14,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   row: {
     flexDirection: "row",
     gap: 12,
   },
-});
+}));

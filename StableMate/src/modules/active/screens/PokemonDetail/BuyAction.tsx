@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { formatMoney } from "@/lib/money";
+import { makeStyles } from "@/theme/colors";
 
 type BuyActionProps = {
   price: number;
@@ -17,6 +18,7 @@ export function BuyAction({
   statusTone = "error",
   onPress,
 }: BuyActionProps) {
+  const styles = useStyles();
   return (
     <View style={styles.wrap}>
       {statusMessage ? (
@@ -40,20 +42,20 @@ export function BuyAction({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   wrap: {
     gap: 10,
   },
   status: {
     fontSize: 14,
-    color: "#B91C1C",
+    color: colors.negative,
     textAlign: "center",
   },
   statusInfo: {
-    color: "#57534E",
+    color: colors.textSecondary,
   },
   button: {
-    backgroundColor: "#1C1917",
+    backgroundColor: colors.accent,
     paddingVertical: 14,
     alignItems: "center",
   },
@@ -64,8 +66,8 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   buttonLabel: {
-    color: "#FFFCF7",
+    color: colors.onAccent,
     fontSize: 17,
     fontWeight: "600",
   },
-});
+}));

@@ -6,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   type ScrollViewInstance,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -14,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { type StarterId, useGameStore } from "@/store/game";
+import { makeStyles } from "@/theme/colors";
 
 const { width: PAGE_WIDTH } = Dimensions.get("window");
 
@@ -36,6 +36,7 @@ const SLIDES = [
 ] as const;
 
 export function WelcomeScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const createState = useGameStore((store) => store.createState);
   const [page, setPage] = useState(0);
@@ -142,10 +143,10 @@ export function WelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
   },
   pager: {
     flex: 1,
@@ -156,13 +157,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
     fontWeight: "700",
-    color: "#1C1917",
+    color: colors.text,
     marginBottom: 12,
   },
   body: {
     fontSize: 17,
     lineHeight: 26,
-    color: "#44403C",
+    color: colors.textSecondary,
   },
   starterList: {
     marginTop: 28,
@@ -170,23 +171,23 @@ const styles = StyleSheet.create({
   },
   starterCard: {
     borderWidth: 1,
-    borderColor: "#D6D3D1",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
     padding: 16,
   },
   starterCardSelected: {
-    borderColor: "#1C1917",
-    backgroundColor: "#E7E5E4",
+    borderColor: colors.accent,
+    backgroundColor: colors.separator,
   },
   starterName: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   starterType: {
     marginTop: 4,
     fontSize: 13,
-    color: "#78716C",
+    color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.6,
   },
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 15,
     lineHeight: 22,
-    color: "#57534E",
+    color: colors.textSecondary,
   },
   footer: {
     paddingHorizontal: 24,
@@ -209,13 +210,13 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#D6D3D1",
+    backgroundColor: colors.fill,
   },
   dotActive: {
-    backgroundColor: "#1C1917",
+    backgroundColor: colors.accent,
   },
   button: {
-    backgroundColor: "#1C1917",
+    backgroundColor: colors.accent,
     paddingVertical: 16,
     alignItems: "center",
   },
@@ -223,8 +224,8 @@ const styles = StyleSheet.create({
     opacity: 0.35,
   },
   buttonLabel: {
-    color: "#FAFAF9",
+    color: colors.onAccent,
     fontSize: 16,
     fontWeight: "600",
   },
-});
+}));

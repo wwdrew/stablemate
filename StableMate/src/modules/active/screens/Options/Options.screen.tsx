@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGameStore } from "@/store/game";
@@ -10,6 +10,7 @@ import {
   useSettingsStore,
   useSettlementOutcome,
 } from "@/store/settings";
+import { makeStyles, useColors } from "@/theme/colors";
 
 type SegmentOption<T extends string> = { value: T; label: string };
 
@@ -34,6 +35,7 @@ function SegmentedControl<T extends string>({
   value: T;
   onChange: (value: T) => void;
 }) {
+  const styles = useStyles();
   return (
     <View style={styles.segmented}>
       {options.map((option) => {
@@ -63,6 +65,8 @@ function SegmentedControl<T extends string>({
 }
 
 export function OptionsScreen() {
+  const styles = useStyles();
+  const colors = useColors();
   const insets = useSafeAreaInsets();
   const isOnline = useIsOnline();
   const setIsOnline = useSettingsStore((store) => store.setIsOnline);
@@ -92,8 +96,7 @@ export function OptionsScreen() {
           accessibilityLabel="Network"
           value={isOnline}
           onValueChange={setIsOnline}
-          trackColor={{ false: "#D6D3D1", true: "#1C1917" }}
-          thumbColor="#FAFAF9"
+          trackColor={{ false: colors.fill, true: colors.accent }}
         />
       </View>
 
@@ -128,30 +131,30 @@ export function OptionsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
+    backgroundColor: colors.background,
     paddingHorizontal: 20,
     gap: 16,
   },
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#1C1917",
+    color: colors.text,
   },
   subtitle: {
     fontSize: 15,
-    color: "#78716C",
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
-    backgroundColor: "#FFFCF7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
+    borderColor: colors.separator,
     padding: 16,
   },
   rowCopy: {
@@ -161,12 +164,12 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#1C1917",
+    color: colors.text,
   },
   rowBody: {
     fontSize: 14,
     lineHeight: 20,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
   section: {
     gap: 8,
@@ -175,13 +178,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: "#A8A29E",
+    color: colors.textTertiary,
   },
   segmented: {
     flexDirection: "row",
     borderWidth: 1,
-    borderColor: "#E7E5E4",
-    backgroundColor: "#FFFCF7",
+    borderColor: colors.separator,
+    backgroundColor: colors.surface,
   },
   segment: {
     flex: 1,
@@ -189,31 +192,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   segmentSelected: {
-    backgroundColor: "#1C1917",
+    backgroundColor: colors.accent,
   },
   segmentLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#57534E",
+    color: colors.textSecondary,
   },
   segmentLabelSelected: {
-    color: "#FFFCF7",
+    color: colors.onAccent,
   },
   dangerButton: {
-    backgroundColor: "#FFFCF7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
+    borderColor: colors.separator,
     padding: 16,
     gap: 4,
   },
   dangerLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#9F1239",
+    color: colors.negative,
   },
   dangerHint: {
     fontSize: 14,
     lineHeight: 20,
-    color: "#78716C",
+    color: colors.textSecondary,
   },
-});
+}));
