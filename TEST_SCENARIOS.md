@@ -277,7 +277,12 @@ Setup for all: O4 with Squirtle.
 
 **H4 · Receipt per type** [Both] ✅ RNTL
 - Open one row each of Prize / Purchase / Sale / Refund
-- Expect: title, signed amount, subtitle, Type, Status, Round, Reference (= ledger id), and Settled / Failed timestamp present for non-pending entries
+- Expect: title, signed amount, subtitle, Type, Status, Round, Reference (= ledger id), and a timeline (H8)
+
+**H8 · Receipt timeline** [Both] ✅ RNTL
+- Each receipt shows how the money moved: `Funds held` → `Waiting to settle` (with `Settling now.` or `Queued until you’re back online.`) → `Purchase settled`, or `Purchase failed` → `Refunded`
+- Sales: `Sale placed` → `Waiting for a buyer` → `Sale settled`, or `Sale failed` → `Back in your stable`. Prizes: `Prize paid`
+- A failed purchase's receipt has `View receipt` for its refund, and the refund links back (`timeline.test.ts` covers every branch)
 
 **H5 · Receipt for a vanished entry** [RNTL] ✅ RNTL
 - `renderRouter` at `/history/missing` → `Transaction not found`

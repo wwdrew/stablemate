@@ -1,13 +1,16 @@
 import { ScrollView, Text, View } from "react-native";
 
-import { settlementFailureMessage } from "@/api/settlement";
 import { typeLabel } from "@/lib/ledger";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
+import type { TimelineStep } from "@/lib/timeline";
 import type { LedgerEntry, TransactionStatus } from "@/store/game";
 import { makeStyles } from "@/theme/colors";
 
+import { ReceiptTimeline } from "./ReceiptTimeline";
+
 type ReceiptScreenProps = {
   entry: LedgerEntry | undefined;
+  timeline: TimelineStep[];
 };
 
 const STATUS_COPY: Record<TransactionStatus, string> = {
@@ -16,13 +19,6 @@ const STATUS_COPY: Record<TransactionStatus, string> = {
   failed: "Failed",
 };
 
-function formatTimestamp(iso: string | null): string {
-  if (!iso) {
-    return "—";
-  }
-  return new Date(iso).toLocaleString();
-}
-
 function balanceCopy(entry: LedgerEntry): string {
   if (entry.balanceAfter !== null) {
     return formatMoney(entry.balanceAfter);
@@ -30,7 +26,7 @@ function balanceCopy(entry: LedgerEntry): string {
   return entry.status === "failed" ? "Not credited" : "Credits on settlement";
 }
 
-export function ReceiptScreen({ entry }: ReceiptScreenProps) {
+export function ReceiptScreen({ entry, timeline }: ReceiptScreenProps) {
   const styles = useStyles();
   if (!entry) {
     return (
@@ -44,16 +40,8 @@ export function ReceiptScreen({ entry }: ReceiptScreenProps) {
   const rows: { label: string; value: string }[] = [
     { label: "Type", value: typeLabel(entry.type) },
     { label: "Status", value: STATUS_COPY[entry.status] },
-    ...(entry.failureReason
-      ? [{ label: "Reason", value: settlementFailureMessage(entry.failureReason) }]
-      : []),
     { label: "Balance after", value: balanceCopy(entry) },
     { label: "Round", value: String(entry.round) },
-    { label: "Created at", value: formatTimestamp(entry.createdAt) },
-    {
-      label: entry.status === "failed" ? "Failed at" : "Settled at",
-      value: formatTimestamp(entry.settledAt),
-    },
     { label: "Reference", value: entry.id },
   ];
 
@@ -75,6 +63,8 @@ export function ReceiptScreen({ entry }: ReceiptScreenProps) {
         </Text>
         <Text style={styles.heroSubtitle}>{entry.subtitle}</Text>
       </View>
+
+      <ReceiptTimeline steps={timeline} />
 
       <View style={styles.card}>
         {rows.map((row) => (

@@ -102,4 +102,3 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 - **Pay in 4.** Split a purchase into instalments debited over the next rounds, with a missed-payment path when funds are short. It reuses holds, pending entries, the queue and the receipt.
 - CI running typecheck, lint and tests, plus Maestro on both platforms.
 - Integer minor units (cents).
-- A settlement timeline on the receipt.

@@ -158,6 +158,10 @@ describe("H4 · receipts", () => {
 
     expect(receipt.getByText("Pending")).toBeOnTheScreen();
     expect(receipt.getByText("Credits on settlement")).toBeOnTheScreen();
+    expect(receipt.getByText("Sale placed")).toBeOnTheScreen();
+    expect(receipt.getByText("Waiting for a buyer")).toBeOnTheScreen();
+    expect(receipt.getByText("Queued until you’re back online.")).toBeOnTheScreen();
+    expect(receipt.getByText("Sale settled")).toBeOnTheScreen();
     expect(receipt.getByText(`+${usd(gengar.markPrice)}`)).toBeOnTheScreen();
     expect(receipt.getByText("Market sale · Round 0")).toBeOnTheScreen();
   });
@@ -171,8 +175,10 @@ describe("H4 · receipts", () => {
     const receipt = await openReceipt("Bought Onix");
 
     expect(receipt.getByText("Failed")).toBeOnTheScreen();
-    expect(receipt.getByText("Failed at")).toBeOnTheScreen();
+    expect(receipt.getByText("Funds held")).toBeOnTheScreen();
+    expect(receipt.getByText("Purchase failed")).toBeOnTheScreen();
     expect(receipt.getByText("Sold out before your order cleared")).toBeOnTheScreen();
+    expect(receipt.getByText("Refunded")).toBeOnTheScreen();
     expect(receipt.getByText(`${usd(CASH - onix.markPrice)}`)).toBeOnTheScreen();
     const entry = store().state!.ledger.find((item) => item.type === "purchase")!;
     expect(receipt.getByText(entry.id)).toBeOnTheScreen();
@@ -186,11 +192,25 @@ describe("H4 · receipts", () => {
 
     expect(receipt.getByText("Prize")).toBeOnTheScreen();
     expect(receipt.getByText("Settled")).toBeOnTheScreen();
-    expect(receipt.getByText("Settled at")).toBeOnTheScreen();
+    expect(receipt.getByText("Prize paid")).toBeOnTheScreen();
     expect(receipt.getByText("+$120")).toBeOnTheScreen();
     expect(receipt.getByText(`${usd(CASH + 120)}`)).toBeOnTheScreen();
     expect(receipt.getByText("Squirtle beat Onix")).toBeOnTheScreen();
   });
+});
+
+test("H8 · a failed purchase's receipt links to its refund", async () => {
+  useSettingsStore.setState({ settlementOutcome: "fail" });
+  await renderApp("/history");
+  await act(() => buyOnix());
+  await settleNext();
+
+  await fireEvent.press(withinTab("history").getByText("Bought Onix"));
+  await fireEvent.press(await screen.findByText("View receipt"));
+
+  const refund = withinScreenContaining("Refund issued");
+  expect(refund.getByText("Refund · Onix")).toBeOnTheScreen();
+  expect(refund.getByText(`${usd(onix.markPrice)} back in your wallet.`)).toBeOnTheScreen();
 });
 
 test("H5 · a receipt for a missing entry says so", async () => {
