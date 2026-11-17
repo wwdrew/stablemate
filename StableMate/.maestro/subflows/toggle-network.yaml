@@ -1,0 +1,6 @@
+# Options → flip the network switch → back to Overview.
+appId: com.wwdrew.StableMate
+---
+- tapOn: "Options"
+- tapOn: "Network"
+- tapOn: "Overview"

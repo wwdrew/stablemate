@@ -1,0 +1,97 @@
+# P4, P3, P7, S4, S3, S2: failed buy refunds, offline buy queues and settles,
+# failed sale rolls back, offline sale queues and settles.
+appId: com.wwdrew.StableMate
+name: Buying and selling
+tags: [money]
+---
+- runFlow: subflows/start-game.yaml
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      BATTLE: Always win
+      SETTLEMENT: Always fail
+
+# P4: a failed purchase is refunded with its own ledger entry.
+- runFlow: subflows/open-affordable-listing.yaml
+- tapOn: "Buy · \\$${output.price}"
+- extendedWaitUntil:
+    visible: "Purchase failed"
+    timeout: 10000
+- assertVisible: "Sold out before your order cleared. \\$${output.price} has been refunded."
+- tapOn: "OK"
+- tapOn: "History"
+- assertVisible: "REFUND, Refund · .*, \\+\\$${output.price}, Bal .*"
+- assertVisible: "PURCHASE · FAILED, .*-\\$${output.price}.*"
+- tapOn: "Stable"
+- assertVisible: "1 Pokémon owned"
+
+# P3, P7: an offline purchase holds the cash and queues, survives a relaunch,
+# then settles when the network comes back.
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      SETTLEMENT: Always settle
+- runFlow: subflows/toggle-network.yaml
+- runFlow: subflows/open-affordable-listing.yaml
+- assertVisible: "You’re offline — funds are held now and the purchase settles when you reconnect."
+- tapOn: "Buy · \\$${output.price}"
+- tapOn: "History"
+- assertVisible: "PURCHASE · PENDING, Bought .*, -\\$${output.price}, Bal .*"
+- stopApp
+- launchApp
+- tapOn: "Stable"
+- extendedWaitUntil:
+    visible: ".*BUYING · PENDING.*"
+    timeout: 30000
+- runFlow: subflows/toggle-network.yaml
+- tapOn: "Stable"
+- extendedWaitUntil:
+    notVisible: ".*PENDING.*"
+    timeout: 10000
+- assertVisible: "2 Pokémon owned"
+- tapOn: "History"
+- assertVisible: "PURCHASE, Bought .*, -\\$${output.price}, Bal .*"
+
+# S4: a failed sale puts the Pokémon back.
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      SETTLEMENT: Always fail
+- tapOn: "Stable"
+- tapOn: "(?!Squirtle).* · [0-9]+W–[0-9]+L, .*"
+- scrollUntilVisible:
+    element: "Sell · .*"
+- copyTextFrom: "Sell · \\$.*"
+- evalScript: ${output.mark = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}
+- tapOn: "Sell · \\$${output.mark}"
+- extendedWaitUntil:
+    visible: "Sale failed"
+    timeout: 10000
+- assertVisible: "No buyers at your price. .* is back in your stable."
+- tapOn: "OK"
+- assertVisible: "2 Pokémon owned"
+- assertNotVisible: ".*PENDING.*"
+
+# S3, S2: an offline sale is pending and credits nothing, then settles when
+# the network comes back.
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      SETTLEMENT: Always settle
+- runFlow: subflows/toggle-network.yaml
+- tapOn: "Stable"
+- tapOn: "(?!Squirtle).* · [0-9]+W–[0-9]+L, .*"
+- scrollUntilVisible:
+    element: "Sell · .*"
+- tapOn: "Sell · \\$${output.mark}"
+- assertVisible: ".*SELLING · PENDING.*"
+- tapOn: "History"
+- assertVisible: "SALE · PENDING, Sold .*, \\+\\$${output.mark}"
+- assertVisible: "\\+\\$${output.mark} pending from sales"
+- runFlow: subflows/toggle-network.yaml
+- tapOn: "Stable"
+- extendedWaitUntil:
+    visible: "1 Pokémon owned"
+    timeout: 10000
+- tapOn: "History"
+- assertVisible: "SALE, Sold .*, \\+\\$${output.mark}, Bal .*"

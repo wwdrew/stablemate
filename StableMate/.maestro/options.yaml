@@ -1,0 +1,52 @@
+# OP1, OP2: the network setting persists but the overrides don't, and Reset
+# game returns to onboarding while keeping the network setting.
+appId: com.wwdrew.StableMate
+name: Options
+tags: [smoke]
+---
+- runFlow: subflows/start-game.yaml
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      BATTLE: Always win
+      SETTLEMENT: Always fail
+- runFlow: subflows/toggle-network.yaml
+- tapOn: "Options"
+- assertVisible:
+    text: "Always win"
+    selected: true
+- assertVisible:
+    text: "Always fail"
+    selected: true
+
+# OP1: after a relaunch the network is still off, the overrides are back to Random.
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: "Wallet and stable at a glance.*"
+    timeout: 30000
+- tapOn: "Options"
+- assertVisible: "Offline — buys and sales queue until you go online."
+- assertNotVisible:
+    text: "Always win"
+    selected: true
+- assertNotVisible:
+    text: "Always fail"
+    selected: true
+
+# OP2: reset goes back to onboarding and keeps the network setting.
+- tapOn: "Reset game.*"
+- extendedWaitUntil:
+    visible: "Build a Pokémon stable.*"
+    timeout: 10000
+- tapOn: "Next"
+- tapOn: "Next"
+- tapOn: "Charmander,.*"
+- tapOn: "Start training"
+- extendedWaitUntil:
+    visible: "Wallet and stable at a glance.*"
+    timeout: 10000
+- assertVisible: "Charmander"
+- assertVisible: "\\$0"
+- tapOn: "Options"
+- assertVisible: "Offline — buys and sales queue until you go online."

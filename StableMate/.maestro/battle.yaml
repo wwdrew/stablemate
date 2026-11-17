@@ -1,0 +1,66 @@
+# B1, B2, B7: a win pays a prize, a loss marks down, and a result survives a force-quit.
+appId: com.wwdrew.StableMate
+name: Battles
+tags: [smoke]
+---
+- runFlow: subflows/start-game.yaml
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      BATTLE: Always win
+
+# B1: win.
+- tapOn: "Stable"
+- tapOn: "Squirtle, .*"
+- scrollUntilVisible:
+    element: "Battle"
+- tapOn: "Battle"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 15000
+- assertVisible: "Squirtle wins"
+- copyTextFrom: "Prize \\+\\$\\d+"
+- evalScript: ${output.prize = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}
+- tapOn: "Continue"
+- assertVisible: "Water · 1W–0L"
+- assertVisible: "\\$459"
+- assertVisible: "Win · \\+\\$${output.prize}"
+- runFlow: subflows/close-modal.yaml
+
+- tapOn: "History"
+- assertVisible: "PRIZE, Battle prize, Squirtle beat .*, \\+\\$${output.prize}, Bal \\$${output.prize}"
+- assertVisible: "1 transaction"
+- tapOn: "Overview"
+- assertVisible: "\\$${output.prize}"
+
+# B2: loss.
+- runFlow:
+    file: subflows/set-overrides.yaml
+    env:
+      BATTLE: Always lose
+- tapOn: "Stable"
+- tapOn: "Squirtle, .*"
+- scrollUntilVisible:
+    element: "Battle"
+- tapOn: "Battle"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 15000
+- assertVisible: "No prize this round"
+- tapOn: "Continue"
+- assertVisible: "Water · 1W–1L"
+- assertVisible: "\\$433"
+- runFlow: subflows/close-modal.yaml
+
+# B7: quit mid-battle; the loss is already recorded.
+- tapOn: "Stable"
+- tapOn: "Squirtle, .*"
+- scrollUntilVisible:
+    element: "Battle"
+- tapOn: "Battle"
+- stopApp
+- launchApp
+- tapOn: "Stable"
+- extendedWaitUntil:
+    visible: "Squirtle, Water · 1W–2L, .*"
+    timeout: 30000

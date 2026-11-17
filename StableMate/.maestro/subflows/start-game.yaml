@@ -1,0 +1,11 @@
+# Fresh install → onboarding → pick ${STARTER} (default Squirtle).
+appId: com.wwdrew.StableMate
+---
+- runFlow: launch.yaml
+- tapOn: "Next"
+- tapOn: "Next"
+- tapOn: "${typeof STARTER !== \"undefined\" ? STARTER : \"Squirtle\"},.*"
+- tapOn: "Start training"
+- extendedWaitUntil:
+    visible: "Wallet and stable at a glance.*"
+    timeout: 10000

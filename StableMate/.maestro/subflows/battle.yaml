@@ -1,0 +1,13 @@
+# Stable → ${FIGHTER} → Battle → Continue → close the detail.
+appId: com.wwdrew.StableMate
+---
+- tapOn: "Stable"
+- tapOn: "${typeof FIGHTER !== \"undefined\" ? FIGHTER : \"Squirtle\"}, .*"
+- scrollUntilVisible:
+    element: "Battle"
+- tapOn: "Battle"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 15000
+- tapOn: "Continue"
+- runFlow: close-modal.yaml

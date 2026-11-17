@@ -1,0 +1,20 @@
+# Battles (set "Always win" first) until a listing is affordable, and leaves
+# its detail open. The lot refreshes each round, so this always converges.
+appId: com.wwdrew.StableMate
+---
+- tapOn: "Buy"
+- tapOn:
+    text: ".* · [0-9]+W–[0-9]+L, \\$.*"
+    index: 0
+- repeat:
+    while:
+      visible: "Insufficient funds.*"
+    commands:
+      - runFlow: close-modal.yaml
+      - runFlow: battle.yaml
+      - tapOn: "Buy"
+      - tapOn:
+          text: ".* · [0-9]+W–[0-9]+L, \\$.*"
+          index: 0
+- copyTextFrom: "Buy · \\$.*"
+- evalScript: ${output.price = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}

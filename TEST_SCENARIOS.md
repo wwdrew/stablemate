@@ -15,10 +15,10 @@ Feature coverage for integration (RNTL) and E2E (Maestro). Each scenario is tagg
 | Battle result | Options → Battle outcome, or `jest.spyOn(battle, "rollPlayerWins")` | Options → `Always win` / `Always lose` |
 | Challenger (→ prize amount) | `jest.spyOn(battle, "pickChallenger")` → fixed species (e.g. Onix) | ✗ — assert prize via pattern or copied text |
 | Settlement result | Options → Settlement outcome, or mock `decideSettlement` | Options → `Always settle` / `Always fail` |
-| Settlement latency (1500ms) | fake timers + `act(() => jest.advanceTimersByTime(SETTLEMENT_LATENCY_MS))` | `extendedWaitUntil` (timeout ≥ 3000) |
+| Settlement latency (1500ms) | fake timers + `act(() => jest.advanceTimersByTime(SETTLEMENT_LATENCY_MS))` | Online, it settles before Maestro can look. Go offline to assert pending, then `extendedWaitUntil` after reconnecting |
 | Battle animation (~5.8s to Continue) | fake timers | `extendedWaitUntil: visible: "Continue"` (timeout 10000) |
-| Market lot | seed store / mock `generateMarketLot` | ✗ — tap the first row by index; read price via copied text |
-| Starting cash | `useGameStore.setState(...)` | grind: `earn-cash` subflow (see below) |
+| Market lot | seed store / mock `generateMarketLot` | ✗ — `open-affordable-listing` taps a row and battles until it's affordable; read the price with `copyTextFrom` |
+| Starting cash | `useGameStore.setState(...)` | grind: `open-affordable-listing` (see below) |
 
 ### Selectors: on-screen text, not testIDs
 
@@ -26,12 +26,11 @@ Assertions read the text the user sees, so a test also checks the copy. Notes:
 
 1. **Scope by tab (RNTL).** Native tabs keep every tab mounted, so text such as a starter's name or a price appears on several tabs at once. Query with `withinTab("index" | "history" | "stable" | "buy" | "options")` from `test/renderApp.tsx`. Maestro only sees the visible tab, so it doesn't need this.
 2. **Scope by screen (RNTL).** A detail modal sits on top of the list it came from. Use `withinScreenContaining("Base stats")` for the Pokémon detail screen, or any text unique to the screen you want.
-3. **`textTransform` text.** RNTL matches the *source* string; Maestro probably sees the *rendered* one (unverified). This affects:
-   - **Pokémon types:** stored lowercase and capitalised by style. The meta line reads `water · 1W–0L` in RNTL. Match the record with a regex (`/1W–0L/`) instead.
-   - **Uppercase labels:** ledger types (`Purchase`, `Prize`…), Overview card labels, and the stable badge (`Selling · pending`).
+3. **`textTransform` text.** RNTL matches the *source* string; Maestro sees the *rendered* one (verified). This affects uppercase labels: ledger types (`PRIZE`, `PURCHASE · PENDING`), Overview card labels, and the stable badge (`BUYING · PENDING`). Pokémon types are capitalised in JS (`formatTypes`), not with `textTransform`, because iOS `capitalize` also lowercased the record (`1w–0l`).
 4. **Curly apostrophes.** Several strings use `’` (e.g. `This round’s market lot`, `You can’t sell your last Pokémon.`). Copy them exactly, or match with `.*` / a regex.
-5. **Dynamic values** (prize, listing price, cash). RNTL pins them with spies (`pickChallenger`) or seeded store state, then asserts the computed string. Maestro reads them from the screen with `copyTextFrom` using a text/regex selector (e.g. `Prize \+\$\d+`), then asserts with `${maestro.copiedText}`.
-6. **Lists (RNTL).** `LegendList` is mapped to `FlatList` in `jest.setup.ts`. LegendList renders no rows without measured layout, and FlatList renders its first 10 rows. Long-list scenarios must scroll or keep the ledger short.
+5. **Dynamic values** (prize, listing price, cash). RNTL pins them with spies (`pickChallenger`) or seeded store state, then asserts the computed string. Maestro reads them with `copyTextFrom` (e.g. `Prize \+\$\d+`), pulls the number out with `evalScript: ${output.prize = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}`, then asserts `\$${output.prize}`. A literal `$` inside `${…}` breaks Maestro's parser, hence the regex.
+6. **Grouped labels (Maestro).** A pressable row or card is one accessibility element whose label joins its texts with `, `, e.g. `Squirtle, Water · 1W–0L, $459` or `PRIZE, Battle prize, Squirtle beat Onix, +$157, Bal $157`. Maestro text selectors match the whole label as a regex, so use `Squirtle, .*`-style patterns.
+7. **Lists (RNTL).** `LegendList` is mapped to `FlatList` in `jest.setup.ts`. LegendList renders no rows without measured layout, and FlatList renders its first 10 rows. Long-list scenarios must scroll or keep the ledger short.
 
 ### RNTL harness
 
@@ -50,12 +49,26 @@ The harness lives in `StableMate/` and runs with `npm test`:
 - **RNTL v14 is async.** `await fireEvent.press(...)`, `await renderApp(...)`, and wrap timer advances in `await act(() => jest.runAllTimers())`.
 - **Battle overlay:** use `jest.useFakeTimers()`, then `runAllTimers()` after pressing Battle to reach `Continue`.
 
-### Shared Maestro subflows
+### Maestro flows
 
-- `start-game.yaml` — `launchApp: clearState: true` → Next → Next → tap `${STARTER}` → Start training
-- `set-overrides.yaml` — Options → `${BATTLE}` → `${SETTLEMENT}` → back to Overview
-- `win-battle.yaml` — Stable → tap starter → Battle → wait for `Continue` → Continue → dismiss modal
-- `earn-cash.yaml` — `repeat: times: 6` of `win-battle` (≥ $546 guaranteed, enough for most lots; ~45s)
+Flows live in `StableMate/.maestro/` and run against the dev build on a booted simulator with Metro running (`npm run e2e`). Each flow starts from a fresh install.
+
+| Flow | Covers |
+|---|---|
+| `onboarding.yaml` | O1, O3, O4, O6 |
+| `battle.yaml` | B1, B2, B3, B7 |
+| `money.yaml` | P4, P3, P7, S4, S3, S2 |
+| `options.yaml` | OP1, OP2 |
+
+Subflows in `.maestro/subflows/`:
+
+- `launch.yaml` — `launchApp: clearState: true`, connect the dev client to Metro, dismiss the dev-menu intro
+- `start-game.yaml` — launch → Next → Next → `${STARTER}` (default Squirtle) → Start training
+- `set-overrides.yaml` — Options → `${BATTLE}` and/or `${SETTLEMENT}` → Overview
+- `toggle-network.yaml` — Options → the `Network` switch → Overview
+- `battle.yaml` — Stable → `${FIGHTER}` → Battle → Continue → close the modal
+- `open-affordable-listing.yaml` — Buy → a listing; while `Insufficient funds`, battle and try again. Leaves the price in `${output.price}`
+- `close-modal.yaml` — swipe the detail modal down
 
 Reference values, with Squirtle as the default starter:
 
@@ -68,7 +81,7 @@ Reference values, with Squirtle as the default starter:
 
 ## 1. Onboarding
 
-**O1 · Slides advance with Next** [Both] ✅ RNTL
+**O1 · Slides advance with Next** [Both] ✅ RNTL · Maestro
 - Fresh install
 - `StableMate` visible → tap `Next` → `How it works` visible → tap `Next` → `Choose your starter` visible
 - Expect: `Start training` replaces `Next` on the last slide; three starter cards are visible
@@ -76,11 +89,11 @@ Reference values, with Squirtle as the default starter:
 **O2 · Slides advance by swiping** [E2E]
 - Swipe left twice → `Choose your starter` visible, `Start training` button shown
 
-**O3 · Start is disabled until a starter is picked** [Both] ✅ RNTL
+**O3 · Start is disabled until a starter is picked** [Both] ✅ RNTL · Maestro
 - Reach the last slide → tap `Start training`
 - Expect: still on onboarding (RNTL: game state stays `null`)
 
-**O4 · Picking each starter** [Both] ✅ RNTL (parameterise over Bulbasaur / Charmander / Squirtle)
+**O4 · Picking each starter** [Both] ✅ RNTL · Maestro (parameterise over Bulbasaur / Charmander / Squirtle)
 - Pick `${STARTER}` → `Start training`
 - Expect on Overview:
   - Starter card shows `${STARTER}` and its type (`Grass` / `Fire` / `Water`)
@@ -94,7 +107,7 @@ Reference values, with Squirtle as the default starter:
 - Tap Bulbasaur → tap Charmander → Start training
 - Expect: Overview starter is `Charmander`, not Bulbasaur
 
-**O6 · Game persists across relaunch** [E2E]
+**O6 · Game persists across relaunch** [E2E] ✅ Maestro
 - O4 → `launchApp` (no `clearState`)
 - Expect: lands on Overview, not onboarding; same starter
 
@@ -104,7 +117,7 @@ Reference values, with Squirtle as the default starter:
 
 Setup for all: O4 with Squirtle.
 
-**B1 · Win** [Both] ✅ RNTL (partial: no chart assertion yet)
+**B1 · Win** [Both] ✅ RNTL · Maestro (partial: no chart assertion yet)
 - Override `Always win` (RNTL: also pin challenger, e.g. Onix → prize known)
 - Stable → Squirtle → `Battle`
 - Expect overlay: `Squirtle wins`, `Prize +$<p>`, `Continue`
@@ -116,7 +129,7 @@ Setup for all: O4 with Squirtle.
   - Chart: accessibility label `Cash over 1 transactions`
 - Maestro: read `<p>` with `copyTextFrom: "Prize \\+\\$\\d+"`, then assert it shows up in History and Overview
 
-**B2 · Loss** [Both] ✅ RNTL
+**B2 · Loss** [Both] ✅ RNTL · Maestro
 - Override `Always lose` → battle
 - Expect overlay: `<challenger> wins`, `No prize this round`
 - Continue → expect:
@@ -125,7 +138,7 @@ Setup for all: O4 with Squirtle.
   - Overview: Cash `$0`, Rounds `1`, Net worth `$407`
   - History: still `No transactions yet` (a loss adds no ledger line)
 
-**B3 · Win then loss accumulate** [Both]
+**B3 · Win then loss accumulate** [Both] ✅ Maestro
 - Win → Continue → Lose → Continue
 - Expect: record `1W–1L`, mark price `$433`, Rounds `2`, two battle history rows (newest first), one prize ledger row
 
@@ -140,7 +153,7 @@ Setup for all: O4 with Squirtle.
 - Battle → wait for overlay → `back`
 - Expect: round settled (Rounds `1`). Documents the `onRequestClose` path
 
-**B7 · Battle result survives a force-quit** [Both] ✅ RNTL
+**B7 · Battle result survives a force-quit** [Both] ✅ RNTL · Maestro
 - `Always lose` → Battle
 - Expect: the loss is recorded as soon as Battle is pressed (Rounds `1`, record `0W–1L`), before `Continue`
 - E2E: `stopApp` before Continue → `launchApp` → still `0W–1L`, Rounds `1`
@@ -166,13 +179,13 @@ Setup for all: O4 with Squirtle.
   - Net worth = cash + Σ mark (unchanged by the buy)
 - Detail of the bought Pokémon: record is its market record; `No battles under your ownership yet.`
 
-**P3 · Offline buy queues, then settles** [Both] ✅ RNTL
+**P3 · Offline buy queues, then settles** [Both] ✅ RNTL · Maestro
 - Options → Simulate network off
 - Buy a listing → detail shows `You’re offline — funds are held now and the purchase settles when you reconnect.` before buying
 - Expect: hold applied, row stays `Buying · pending` beyond 3s; History row `Pending`
 - Network on → within ~1.5s it settles as in P2
 
-**P4 · Failed buy refunds** [Both] ✅ RNTL
+**P4 · Failed buy refunds** [Both] ✅ RNTL · Maestro
 - `Always fail` → buy `<name>` at `<b>`
 - Expect:
   - Alert `Purchase failed`, `Sold out before your order cleared. $<b> has been refunded.` (RNTL: spy `Alert.alert`)
@@ -189,7 +202,7 @@ Setup for all: O4 with Squirtle.
 - Offline → buy → open it in Stable
 - Expect: `Purchase pending. Settles when you’re back online.`; Battle and Sell disabled
 
-**P7 · Pending queue survives relaunch** [E2E] / [RNTL via rehydrate]
+**P7 · Pending queue survives relaunch** [E2E] / [RNTL via rehydrate] ✅ Maestro
 - Offline → buy → relaunch (no `clearState`)
 - Expect: still pending; network still off (persisted); network on → settles
 
@@ -205,7 +218,7 @@ Setup for all: O4 with Squirtle.
 - Stable → starter
 - Expect: `You can’t sell your last Pokémon.`, `Sell · $433` disabled
 
-**S2 · Online sale settles** [Both] ✅ RNTL
+**S2 · Online sale settles** [Both] ✅ RNTL · Maestro
 - Setup: P2 done (2 Pokémon); `Always settle`
 - Stable → bought Pokémon (mark `<m>`) → `Sell · $<m>`
 - Expect immediately:
@@ -221,10 +234,10 @@ Setup for all: O4 with Squirtle.
   - Net worth unchanged from before the sale (asset swapped for cash)
   - Chart gains a step up
 
-**S3 · Offline sale queues** [Both] ✅ RNTL
+**S3 · Offline sale queues** [Both] ✅ RNTL · Maestro
 - Network off → sell → row pending beyond 3s, detail shows `Sale pending at $<m>. Settles when you’re back online.` → network on → settles as S2
 
-**S4 · Failed sale rolls back** [Both] ✅ RNTL
+**S4 · Failed sale rolls back** [Both] ✅ RNTL · Maestro
 - `Always fail` → sell
 - Expect:
   - Alert `Sale failed`, `No buyers at your price. <name> is back in your stable.`
@@ -283,11 +296,11 @@ Setup for all: O4 with Squirtle.
 
 ## 7. Options and persistence
 
-**OP1 · Network toggle persists, overrides reset** [E2E]
+**OP1 · Network toggle persists, overrides reset** [E2E] ✅ Maestro
 - Network off, `Always win`, `Always fail` → relaunch
 - Expect: network still off; Battle and Settlement outcome back to `Random`
 
-**OP2 · Reset game** [Both] ✅ RNTL
+**OP2 · Reset game** [Both] ✅ RNTL · Maestro
 - Mid-game (with pending transactions) → `Reset game`
 - Expect:
   - Onboarding `StableMate` slide; picking a starter starts fresh at Cash `$0`

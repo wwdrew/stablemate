@@ -1,0 +1,7 @@
+# Swipe a detail modal down to dismiss it.
+appId: com.wwdrew.StableMate
+---
+- swipe:
+    start: 50%, 12%
+    end: 50%, 90%
+- waitForAnimationToEnd

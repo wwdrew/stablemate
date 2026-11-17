@@ -1,0 +1,16 @@
+# Options → set whichever overrides are passed, then back to Overview.
+# BATTLE: Always win | Always lose. SETTLEMENT: Always settle | Always fail.
+appId: com.wwdrew.StableMate
+---
+- tapOn: "Options"
+- runFlow:
+    when:
+      true: ${typeof BATTLE !== "undefined"}
+    commands:
+      - tapOn: ${BATTLE}
+- runFlow:
+    when:
+      true: ${typeof SETTLEMENT !== "undefined"}
+    commands:
+      - tapOn: ${SETTLEMENT}
+- tapOn: "Overview"

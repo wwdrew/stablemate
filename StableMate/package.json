@@ -50,6 +50,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "lint": "expo lint",
+    "e2e": "maestro test .maestro",
     "catalog:fetch": "node ./scripts/fetch-catalog.mjs",
     "test": "jest"
   },

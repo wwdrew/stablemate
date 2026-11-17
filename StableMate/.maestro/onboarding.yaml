@@ -1,0 +1,39 @@
+# O1, O4, O6: onboarding, the starting position, and persistence across relaunch.
+appId: com.wwdrew.StableMate
+name: Onboarding
+tags: [smoke]
+---
+- runFlow: subflows/launch.yaml
+- assertVisible: "StableMate"
+- tapOn: "Next"
+- assertVisible: "How it works"
+- tapOn: "Next"
+- assertVisible: "Choose your starter"
+- assertVisible: "Start training"
+- assertVisible: "Bulbasaur, GRASS.*"
+- assertVisible: "Charmander, FIRE.*"
+- assertVisible: "Squirtle, WATER.*"
+
+# O3: nothing picked, so Start does nothing.
+- tapOn: "Start training"
+- assertVisible: "Choose your starter"
+
+- tapOn: "Squirtle, WATER.*"
+- tapOn: "Start training"
+
+# O4: the starting position.
+- extendedWaitUntil:
+    visible: "Wallet and stable at a glance.*"
+    timeout: 10000
+- assertVisible: "Squirtle"
+- assertVisible: "\\$0"
+- assertVisible: "\\$433"
+- assertVisible: "Win a prize or trade to start the chart."
+
+# O6: the game survives a relaunch.
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: "Win a prize or trade to start the chart."
+    timeout: 30000
+- assertNotVisible: "Choose your starter"
