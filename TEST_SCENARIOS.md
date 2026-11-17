@@ -57,7 +57,7 @@ Flows live in `StableMate/.maestro/` and run against the dev build on a booted s
 |---|---|
 | `onboarding.yaml` | O1, O3, O4, O6 |
 | `battle.yaml` | B1, B2, B3, B7 |
-| `money.yaml` | P4, P3, P7, S4, S3, S2 |
+| `money.yaml` | P4, H6, P3, P7, S4, S3, S2 |
 | `options.yaml` | OP1, OP3, OP2 |
 
 Subflows in `.maestro/subflows/`:
@@ -281,6 +281,14 @@ Setup for all: O4 with Squirtle.
 
 **H5 · Receipt for a vanished entry** [RNTL] ✅ RNTL
 - `renderRouter` at `/history/missing` → `Transaction not found`
+
+**H6 · Filters** [Both] ✅ RNTL · Maestro
+- A settled prize, a failed purchase with its refund, and an offline (pending) sale
+- `Open` → the sale only; `Settled` → refund and prize; `Failed` → the purchase; `All` → everything, pending first
+- The balance card still counts every transaction
+
+**H7 · Empty filter** [RNTL] ✅ RNTL
+- Only a prize → `Failed` → `No failed transactions.`
 
 ---
 

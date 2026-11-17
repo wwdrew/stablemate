@@ -1,9 +1,10 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { Link } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { statusLabel, typeLabel } from "@/lib/ledger";
+import { type SegmentOption, SegmentedControl } from "@/components/SegmentedControl";
+import { filterLedger, type LedgerFilter, statusLabel, typeLabel } from "@/lib/ledger";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import {
   type LedgerEntry,
@@ -12,6 +13,19 @@ import {
   usePendingCredits,
 } from "@/store/game";
 import { makeStyles } from "@/theme/colors";
+
+const FILTER_OPTIONS: SegmentOption<LedgerFilter>[] = [
+  { value: "all", label: "All" },
+  { value: "open", label: "Open" },
+  { value: "settled", label: "Settled" },
+  { value: "failed", label: "Failed" },
+];
+
+const FILTER_EMPTY_COPY: Record<Exclude<LedgerFilter, "all">, string> = {
+  open: "Nothing waiting to settle.",
+  settled: "No settled transactions yet.",
+  failed: "No failed transactions.",
+};
 
 function TransactionRow({ item }: { item: LedgerEntry }) {
   const styles = useStyles();
@@ -73,15 +87,9 @@ export function HistoryScreen() {
   const ledger = useLedger();
   const cash = useCash();
   const pendingCredits = usePendingCredits();
+  const [filter, setFilter] = useState<LedgerFilter>("all");
 
-  // Pending first (like a bank app), then posted activity newest-first.
-  const entries = useMemo(
-    () => [
-      ...ledger.filter((entry) => entry.status === "pending"),
-      ...ledger.filter((entry) => entry.status !== "pending"),
-    ],
-    [ledger],
-  );
+  const entries = useMemo(() => filterLedger(ledger, filter), [ledger, filter]);
 
   return (
     <LegendList
@@ -111,16 +119,25 @@ export function HistoryScreen() {
                 : `${ledger.length} transactions`}
             </Text>
           </View>
+          {ledger.length > 0 ? (
+            <SegmentedControl options={FILTER_OPTIONS} value={filter} onChange={setFilter} />
+          ) : null}
         </View>
       }
       ListEmptyComponent={
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No transactions yet</Text>
-          <Text style={styles.emptyBody}>
-            Win battle prizes or trade on the market — each cash movement shows
-            up in this ledger.
-          </Text>
-        </View>
+        filter !== "all" && ledger.length > 0 ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyBody}>{FILTER_EMPTY_COPY[filter]}</Text>
+          </View>
+        ) : (
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>No transactions yet</Text>
+            <Text style={styles.emptyBody}>
+              Win battle prizes or trade on the market — each cash movement
+              shows up in this ledger.
+            </Text>
+          </View>
+        )
       }
       renderItem={({ item }) => <TransactionRow item={item} />}
       ItemSeparatorComponent={() => <View style={styles.separator} />}

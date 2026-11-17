@@ -22,6 +22,11 @@ tags: [money]
 - tapOn: "History"
 - assertVisible: "REFUND, Refund · .*, \\+\\$${output.price}, Bal .*"
 - assertVisible: "PURCHASE · FAILED, .*-\\$${output.price}.*"
+# H6: filter History to failed entries, then back to all.
+- tapOn: "Failed"
+- assertVisible: "PURCHASE · FAILED, .*"
+- assertNotVisible: "REFUND, .*"
+- tapOn: "All"
 - tapOn: "Stable"
 - assertVisible: "1 Pokémon owned"
 

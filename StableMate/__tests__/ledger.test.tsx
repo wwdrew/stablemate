@@ -60,7 +60,7 @@ function buyOnix() {
 
 function historyTitles() {
   return withinTab("history")
-    .getAllByText(/^(Battle prize|Bought|Sold|Refund)/)
+    .getAllByText(/^(Battle prize|Bought \S+|Sold \S+|Refund · \S+)$/)
     .map((node) => [node.props.children].flat().join(""));
 }
 
@@ -197,4 +197,50 @@ test("H5 · a receipt for a missing entry says so", async () => {
   await renderApp("/history/missing");
 
   expect(screen.getByText("Transaction not found")).toBeOnTheScreen();
+});
+
+test("H6 · filters show open, settled and failed entries", async () => {
+  // A settled prize, a failed purchase with its refund, and a pending sale.
+  useSettingsStore.setState({ settlementOutcome: "fail" });
+  winPrize(100);
+  buyOnix();
+  await renderApp("/history");
+  await settleNext();
+  await setSettings({ isOnline: false });
+  await act(() => {
+    store().sellOwned(gengar.id);
+  });
+
+  const history = withinTab("history");
+  const filter = async (label: string) =>
+    fireEvent.press(history.getByRole("button", { name: label }));
+
+  expect(historyTitles()).toEqual([
+    "Sold Gengar",
+    "Refund · Onix",
+    "Bought Onix",
+    "Battle prize",
+  ]);
+
+  await filter("Open");
+  expect(historyTitles()).toEqual(["Sold Gengar"]);
+
+  await filter("Settled");
+  expect(historyTitles()).toEqual(["Refund · Onix", "Battle prize"]);
+
+  await filter("Failed");
+  expect(historyTitles()).toEqual(["Bought Onix"]);
+
+  // The balance card still covers everything.
+  expect(history.getByText("4 transactions")).toBeOnTheScreen();
+});
+
+test("H7 · an empty filter says so", async () => {
+  winPrize(100);
+  await renderApp("/history");
+
+  await fireEvent.press(withinTab("history").getByRole("button", { name: "Failed" }));
+
+  expect(withinTab("history").getByText("No failed transactions.")).toBeOnTheScreen();
+  expect(withinTab("history").queryByText("Battle prize")).not.toBeOnTheScreen();
 });
