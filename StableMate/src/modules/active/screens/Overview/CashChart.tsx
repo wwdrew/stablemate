@@ -1,149 +1,167 @@
 import { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import Svg, { Line, Path, Text as SvgText } from "react-native-svg";
 
 import { formatMoney } from "@/lib/money";
-import { useLedger } from "@/store/game";
+import { useLedger, useRoundsPlayed } from "@/store/game";
+import { makeStyles, useColors } from "@/theme/colors";
 
-const PAD = 12;
-const STROKE = 2;
-const POSITIVE = "#15803D";
-const NEGATIVE = "#B91C1C";
+import { cashSeries, niceTicks, roundLabelStep } from "./cashChartModel";
 
-type Point = { x: number; y: number; cash: number };
-
-function Segment({ from, to }: { from: Point; to: Point }) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy);
-
-  // A thin bar centred on the segment midpoint, rotated to join the two points.
-  return (
-    <View
-      style={{
-        position: "absolute",
-        left: (from.x + to.x) / 2 - length / 2,
-        top: (from.y + to.y) / 2 - STROKE / 2,
-        width: length,
-        height: STROKE,
-        backgroundColor: (from.cash + to.cash) / 2 >= 0 ? POSITIVE : NEGATIVE,
-        transform: [{ rotate: `${Math.atan2(dy, dx)}rad` }],
-      }}
-    />
-  );
-}
-
-/** Splits any segment that crosses zero so each half takes its own colour. */
-function splitAtZero(points: Point[], baselineY: number): [Point, Point][] {
-  const segments: [Point, Point][] = [];
-
-  for (let index = 1; index < points.length; index += 1) {
-    const from = points[index - 1]!;
-    const to = points[index]!;
-
-    if (from.cash >= 0 === to.cash >= 0 || from.cash === 0 || to.cash === 0) {
-      segments.push([from, to]);
-      continue;
-    }
-
-    const t = from.cash / (from.cash - to.cash);
-    const crossing = { x: from.x + (to.x - from.x) * t, y: baselineY, cash: 0 };
-    segments.push([from, { ...crossing, cash: from.cash }]);
-    segments.push([{ ...crossing, cash: to.cash }, to]);
-  }
-
-  return segments;
-}
+const HEIGHT = 200;
+const LEFT = 52;
+const RIGHT = 8;
+const TOP = 10;
+const BOTTOM = 24;
+const TICK = 4;
+const LABEL_SIZE = 11;
 
 /**
- * Cash after every movement that posted to the ledger, oldest first, from the
- * $0 starting balance. Baseline is $0 through the vertical centre.
+ * Cash after every posted movement, plotted against rounds. Cash can't go
+ * negative (battles never cost money and holds stop overspending), so the
+ * baseline is $0 at the bottom.
  */
 export function CashChart() {
+  const styles = useStyles();
+  const colors = useColors();
   const ledger = useLedger();
-  const balances = useMemo(
-    () => [
-      0,
-      // Ledger is newest-first by posting time; pending sale credits have no balance yet.
-      ...[...ledger]
-        .reverse()
-        .flatMap((entry) => (entry.balanceAfter === null ? [] : [entry.balanceAfter])),
-    ],
-    [ledger],
-  );
+  const roundsPlayed = useRoundsPlayed();
   const [width, setWidth] = useState(0);
-  const height = width / 2;
-  const baselineY = height / 2;
 
-  const maxAbs = Math.max(1, ...balances.map((cash) => Math.abs(cash)));
-  const step = balances.length > 1 ? (width - PAD * 2) / (balances.length - 1) : 0;
-  const points: Point[] = balances.map((cash, index) => ({
-    x: PAD + index * step,
-    y: baselineY - (cash / maxAbs) * (baselineY - PAD),
-    cash,
-  }));
+  const points = useMemo(() => cashSeries(ledger), [ledger]);
+  const yTicks = niceTicks(Math.max(...points.map((point) => point.cash)));
+  const yMax = yTicks[yTicks.length - 1]! || 1;
+  // Show every round played, plus the current one if trades happened in it.
+  const rounds = Math.max(1, roundsPlayed, Math.ceil(points[points.length - 1]!.x));
+  const labelStep = roundLabelStep(rounds);
+
+  const plotWidth = width - LEFT - RIGHT;
+  const plotHeight = HEIGHT - TOP - BOTTOM;
+  const xFor = (round: number) => LEFT + (round / rounds) * plotWidth;
+  const yFor = (cash: number) => TOP + plotHeight - (cash / yMax) * plotHeight;
+  const bottom = yFor(0);
+
+  const line = points
+    .map((point, index) => `${index === 0 ? "M" : "L"}${xFor(point.x)},${yFor(point.cash)}`)
+    .join(" ");
+  const area = `${line} L${xFor(points[points.length - 1]!.x)},${bottom} L${xFor(0)},${bottom} Z`;
+  const hasData = points.length > 1;
 
   return (
     <View style={styles.card}>
       <Text style={styles.label}>Cash over time</Text>
       <View
-        style={[styles.plot, { height }]}
+        style={styles.plot}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-        accessibilityLabel={`Cash over ${balances.length - 1} transactions`}
+        accessibilityLabel={`Cash over ${points.length - 1} transactions and ${rounds} rounds`}
       >
         {width > 0 ? (
-          <>
-            <View style={[styles.baseline, { top: baselineY }]} />
-            <Text style={[styles.axisLabel, { top: 0 }]}>{formatMoney(maxAbs)}</Text>
-            <Text style={[styles.axisLabel, { top: baselineY + 2 }]}>{formatMoney(0)}</Text>
-            {splitAtZero(points, baselineY).map(([from, to], index) => (
-              <Segment key={index} from={from} to={to} />
+          <Svg width={width} height={HEIGHT}>
+            {yTicks.map((value) => (
+              <Line
+                key={`grid-${value}`}
+                x1={LEFT - TICK}
+                x2={LEFT + plotWidth}
+                y1={yFor(value)}
+                y2={yFor(value)}
+                stroke={colors.separator}
+                strokeWidth={value === 0 ? 1 : 0.5}
+              />
             ))}
-          </>
+            {yTicks.map((value) => (
+              <SvgText
+                key={`y-${value}`}
+                x={LEFT - TICK - 4}
+                y={yFor(value) + LABEL_SIZE / 3}
+                fontSize={LABEL_SIZE}
+                textAnchor="end"
+                fill={colors.textTertiary}
+              >
+                {formatMoney(value)}
+              </SvgText>
+            ))}
+
+            {Array.from({ length: rounds + 1 }, (_, round) => (
+              <Line
+                key={`tick-${round}`}
+                x1={xFor(round)}
+                x2={xFor(round)}
+                y1={bottom}
+                y2={bottom + TICK}
+                stroke={colors.textTertiary}
+                strokeWidth={1}
+              />
+            ))}
+            {/* Each round's number sits under its span; its prize lands at the right-hand tick. */}
+            {Array.from({ length: rounds }, (_, index) => index + 1)
+              .filter((round) => round === 1 || round % labelStep === 0)
+              .map((round) => (
+                <SvgText
+                  key={`x-${round}`}
+                  x={xFor(round - 0.5)}
+                  y={bottom + TICK + LABEL_SIZE + 2}
+                  fontSize={LABEL_SIZE}
+                  textAnchor="middle"
+                  fill={colors.textTertiary}
+                >
+                  {round}
+                </SvgText>
+              ))}
+
+            {hasData ? (
+              <>
+                <Path d={area} fill={colors.positive} fillOpacity={0.12} />
+                <Path
+                  d={line}
+                  fill="none"
+                  stroke={colors.positive}
+                  strokeWidth={2}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              </>
+            ) : null}
+          </Svg>
         ) : null}
-        {balances.length < 2 ? (
+        {hasData ? null : (
           <Text style={styles.empty}>Win a prize or trade to start the chart.</Text>
-        ) : null}
+        )}
       </View>
+      <Text style={styles.axisTitle}>Round</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
-    backgroundColor: "#FFFCF7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E7E5E4",
+    borderColor: colors.separator,
     padding: 16,
-    gap: 12,
+    gap: 8,
   },
   label: {
     fontSize: 12,
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: "#A8A29E",
+    color: colors.textTertiary,
   },
   plot: {
     width: "100%",
+    height: HEIGHT,
     justifyContent: "center",
   },
-  baseline: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: "#1C1917",
-  },
-  axisLabel: {
-    position: "absolute",
-    left: 0,
-    fontSize: 11,
-    color: "#A8A29E",
+  axisTitle: {
+    alignSelf: "center",
+    fontSize: LABEL_SIZE,
+    color: colors.textTertiary,
   },
   empty: {
+    position: "absolute",
     alignSelf: "center",
     fontSize: 13,
-    color: "#78716C",
-    backgroundColor: "#FFFCF7",
+    color: colors.textSecondary,
+    backgroundColor: colors.surface,
     paddingHorizontal: 8,
   },
-});
+}));

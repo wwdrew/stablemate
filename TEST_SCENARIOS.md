@@ -126,7 +126,7 @@ Setup for all: O4 with Squirtle.
   - Battle history row `Round 1 · vs <challenger>`, `Win · +$<p>`, `W`
   - Overview: Cash `$<p>`, Rounds `1`, Net worth `$<p + 459>`
   - History: 1 row with type `Prize`, `Battle prize`, `Squirtle beat <challenger>`, `+$<p>`, `Bal $<p>`; balance card `$<p>`, `1 transaction`
-  - Chart: accessibility label `Cash over 1 transactions`
+  - Chart: accessibility label `Cash over 1 transactions and 1 rounds`
 - Maestro: read `<p>` with `copyTextFrom: "Prize \\+\\$\\d+"`, then assert it shows up in History and Overview
 
 **B2 · Loss** [Both] ✅ RNTL · Maestro
@@ -284,13 +284,13 @@ Setup for all: O4 with Squirtle.
 **OV1 · Totals after a full journey** [Both]
 - After B1 → P2 → S2: Cash, Rounds, Stable size and Net worth match the sum of the steps
 
-**OV2 · Chart points** [RNTL]
-- Accessibility label `Cash over N transactions`, where N = posted ledger entries
-- Pending sale adds no point until it settles
-- Failed purchase adds two points (hold + refund)
+**OV2 · Chart points** [unit] ✅ `cashChartModel.test.ts`
+- `cashSeries`: prizes land at the end of their round, trades are spread between battles, pending entries aren't plotted, and a late-settling sale never moves the line backwards
+- Accessibility label `Cash over N transactions and R rounds`, where N = posted ledger entries
 
-**OV3 · Chart colour split** [unit]
-- Export and test `splitAtZero`. Cash never goes negative today, so test it directly with signed inputs
+**OV3 · Chart axes** [unit] ✅ `cashChartModel.test.ts`
+- `niceTicks`: round-number steps from $0 (cash can't go negative, so $0 is the bottom)
+- `roundLabelStep`: round numbers thin out as rounds pile up
 
 ---
 
