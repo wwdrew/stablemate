@@ -1,4 +1,4 @@
-import { Pressable, Switch, Text, View } from "react-native";
+import { Alert, Pressable, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGameStore } from "@/store/game";
@@ -78,6 +78,16 @@ export function OptionsScreen() {
   );
   const clearState = useGameStore((store) => store.clearState);
 
+  const confirmReset = () =>
+    Alert.alert(
+      "Reset game?",
+      "This clears your stable, cash and history. Your network setting is kept.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Reset", style: "destructive", onPress: clearState },
+      ],
+    );
+
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 16 }]}>
       <Text style={styles.title}>Options</Text>
@@ -120,7 +130,7 @@ export function OptionsScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Danger zone</Text>
-        <Pressable onPress={clearState} style={styles.dangerButton}>
+        <Pressable onPress={confirmReset} style={styles.dangerButton}>
           <Text style={styles.dangerLabel}>Reset game</Text>
           <Text style={styles.dangerHint}>
             Clears your stable and returns to onboarding.

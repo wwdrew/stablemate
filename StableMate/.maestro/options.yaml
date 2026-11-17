@@ -1,5 +1,5 @@
-# OP1, OP2: the network setting persists but the overrides don't, and Reset
-# game returns to onboarding while keeping the network setting.
+# OP1, OP2, OP3: the network setting persists but the overrides don't, and Reset
+# game asks first, then returns to onboarding while keeping the network setting.
 appId: com.wwdrew.StableMate
 name: Options
 tags: [smoke]
@@ -34,8 +34,15 @@ tags: [smoke]
     text: "Always fail"
     selected: true
 
+# OP3: cancelling the reset keeps the game.
+- tapOn: "Reset game.*"
+- assertVisible: "Reset game?"
+- tapOn: "Cancel"
+- assertVisible: "Demo controls and game settings."
+
 # OP2: reset goes back to onboarding and keeps the network setting.
 - tapOn: "Reset game.*"
+- tapOn: "Reset"
 - extendedWaitUntil:
     visible: "Build a Pokémon stable.*"
     timeout: 10000

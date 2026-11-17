@@ -58,7 +58,7 @@ Flows live in `StableMate/.maestro/` and run against the dev build on a booted s
 | `onboarding.yaml` | O1, O3, O4, O6 |
 | `battle.yaml` | B1, B2, B3, B7 |
 | `money.yaml` | P4, P3, P7, S4, S3, S2 |
-| `options.yaml` | OP1, OP2 |
+| `options.yaml` | OP1, OP3, OP2 |
 
 Subflows in `.maestro/subflows/`:
 
@@ -306,11 +306,15 @@ Setup for all: O4 with Squirtle.
 - Expect: network still off; Battle and Settlement outcome back to `Random`
 
 **OP2 · Reset game** [Both] ✅ RNTL · Maestro
-- Mid-game (with pending transactions) → `Reset game`
+- Mid-game (with pending transactions) → `Reset game` → confirm `Reset`
 - Expect:
   - Onboarding `StableMate` slide; picking a starter starts fresh at Cash `$0`
   - Network setting kept
 - Also asserts no `console.error`. Null-state selectors are covered separately in `selectors.test.tsx`
+
+**OP3 · Reset asks first** [Both] ✅ RNTL · Maestro
+- `Reset game` → alert `Reset game?` with `Cancel` and a destructive `Reset`
+- `Cancel` → still on Options, game kept
 
 ---
 
