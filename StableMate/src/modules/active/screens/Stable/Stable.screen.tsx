@@ -3,6 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
 import { formatMoney } from "@/lib/money";
+import { formatTypes } from "@/lib/pokemon";
 import { type OwnedPokemon, useStable } from "@/store/game";
 
 function StableRow({ item }: { item: OwnedPokemon }) {
@@ -31,7 +32,7 @@ function StableRow({ item }: { item: OwnedPokemon }) {
             {species?.name ?? item.speciesId}
           </Text>
           <Text style={styles.rowMeta}>
-            {species?.types.join(" / ") ?? "—"} · {record}
+            {species ? formatTypes(species.types) : "—"} · {record}
           </Text>
           {pendingLabel ? (
             <Text style={styles.rowPendingLabel}>{pendingLabel}</Text>
@@ -120,7 +121,6 @@ const styles = StyleSheet.create({
   rowMeta: {
     fontSize: 13,
     color: "#78716C",
-    textTransform: "capitalize",
   },
   rowPrice: {
     fontSize: 17,

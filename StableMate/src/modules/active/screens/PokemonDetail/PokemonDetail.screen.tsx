@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { formatMoney, formatSignedMoney } from "@/lib/money";
+import { formatTypes } from "@/lib/pokemon";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import type { BattleRecord } from "@/store/game";
 
@@ -30,7 +31,7 @@ export function PokemonDetailScreen({
   actions,
 }: PokemonDetailScreenProps) {
   const artwork = pokemon.sprites.artwork ?? pokemon.sprites.default;
-  const types = pokemon.types.join(" / ");
+  const types = formatTypes(pokemon.types);
   const record = `${pokemon.wins}W–${pokemon.losses}L`;
 
   return (
@@ -154,7 +155,6 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: 15,
     color: "#78716C",
-    textTransform: "capitalize",
   },
   markPrice: {
     marginTop: 4,

@@ -11,10 +11,11 @@ import {
 import { useMarketLot } from "@/api/useMarketLot";
 import type { MarketListing } from "@/api/marketLot";
 import { formatMoney } from "@/lib/money";
+import { formatTypes } from "@/lib/pokemon";
 
 function ListingRow({ item }: { item: MarketListing }) {
   const record = `${item.wins}W–${item.losses}L`;
-  const types = item.types.join(" / ");
+  const types = formatTypes(item.types);
 
   return (
     <Link
@@ -124,7 +125,6 @@ const styles = StyleSheet.create({
   rowMeta: {
     fontSize: 13,
     color: "#78716C",
-    textTransform: "capitalize",
   },
   priceBlock: {
     alignItems: "flex-end",

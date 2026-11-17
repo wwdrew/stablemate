@@ -46,7 +46,7 @@ test("B1 · a win pays the prize and records the win", async () => {
   await fireEvent.press(screen.getByText("Continue"));
 
   const detail = withinScreenContaining("Base stats");
-  expect(detail.getByText(/1W–0L/)).toBeOnTheScreen();
+  expect(detail.getByText("Water · 1W–0L")).toBeOnTheScreen();
   expect(detail.getByText("$459")).toBeOnTheScreen();
   expect(detail.getByText("Round 1 · vs Onix")).toBeOnTheScreen();
   expect(detail.getByText(`Win · +${usd(prize)}`)).toBeOnTheScreen();
@@ -70,7 +70,7 @@ test("B2 · a loss pays nothing and records the loss", async () => {
   await fightAndContinue();
 
   const detail = withinScreenContaining("Base stats");
-  expect(detail.getByText(/0W–1L/)).toBeOnTheScreen();
+  expect(detail.getByText("Water · 0W–1L")).toBeOnTheScreen();
   expect(detail.getByText("$407")).toBeOnTheScreen();
   expect(detail.getByText("Round 1 · vs Onix")).toBeOnTheScreen();
   expect(detail.getByText("Loss")).toBeOnTheScreen();
