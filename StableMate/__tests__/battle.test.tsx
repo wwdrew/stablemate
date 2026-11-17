@@ -2,6 +2,7 @@ import { act, fireEvent, screen } from "@testing-library/react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
 import * as battle from "@/lib/battle";
+import { usePrefersReducedMotion } from "@/lib/motion";
 import { useGameStore } from "@/store/game";
 import { useSettingsStore } from "@/store/settings";
 
@@ -13,6 +14,10 @@ import {
   withinTab,
 } from "../test/renderApp";
 
+jest.mock("@/lib/motion", () => ({
+  usePrefersReducedMotion: jest.fn(() => false),
+}));
+
 const onix = getSpeciesBySlug("onix")!;
 const prize = battle.prizeMoneyForWin(onix);
 
@@ -20,6 +25,7 @@ beforeEach(() => {
   resetStores();
   jest.useFakeTimers();
   jest.spyOn(battle, "pickChallenger").mockReturnValue(onix);
+  jest.mocked(usePrefersReducedMotion).mockReturnValue(false);
   useGameStore.getState().createState("squirtle");
 });
 
@@ -91,4 +97,27 @@ test("B7 · the result is committed when the battle starts, not on Continue", as
   const state = useGameStore.getState().state!;
   expect(state.roundsPlayed).toBe(1);
   expect(state.stable[0]).toMatchObject({ wins: 0, losses: 1 });
+});
+
+describe("B8 · reduce motion", () => {
+  test("the result waits for the animation by default", async () => {
+    useSettingsStore.setState({ battleOutcome: "win" });
+    await renderApp("/stable/squirtle-starter");
+
+    await fireEvent.press(screen.getByText("Battle"));
+
+    expect(screen.queryByText("Continue")).not.toBeOnTheScreen();
+  });
+
+  test("with Reduce Motion on, the result shows straight away", async () => {
+    jest.mocked(usePrefersReducedMotion).mockReturnValue(true);
+    useSettingsStore.setState({ battleOutcome: "win" });
+    await renderApp("/stable/squirtle-starter");
+
+    await fireEvent.press(screen.getByText("Battle"));
+
+    expect(screen.getByText("Squirtle wins")).toBeOnTheScreen();
+    expect(screen.getByText(`Prize +${usd(prize)}`)).toBeOnTheScreen();
+    expect(screen.getByText("Continue")).toBeOnTheScreen();
+  });
 });

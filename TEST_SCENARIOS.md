@@ -158,6 +158,11 @@ Setup for all: O4 with Squirtle.
 - Expect: the loss is recorded as soon as Battle is pressed (Rounds `1`, record `0W–1L`), before `Continue`
 - E2E: `stopApp` before Continue → `launchApp` → still `0W–1L`, Rounds `1`
 
+**B8 · Reduce Motion skips the fight** [RNTL] ✅ RNTL
+- Mock `usePrefersReducedMotion` → `true` → Battle
+- Expect: `Squirtle wins`, the prize and `Continue` straight away, with no timers advanced
+- Control: with it off, `Continue` isn't there until the animation ends
+
 ---
 
 ## 3. Buying

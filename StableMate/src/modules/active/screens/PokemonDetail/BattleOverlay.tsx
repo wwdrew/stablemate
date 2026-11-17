@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogSpecies } from "@/data/catalog.schema";
 import { formatSignedMoney } from "@/lib/money";
+import { usePrefersReducedMotion } from "@/lib/motion";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 
 type BattleOverlayProps = {
@@ -71,7 +72,9 @@ export function BattleOverlay({
   onFinished,
 }: BattleOverlayProps) {
   const insets = useSafeAreaInsets();
-  const [showResult, setShowResult] = useState(false);
+  // With Reduce Motion on, skip the fight: show the result at once and dim the loser.
+  const reduceMotion = usePrefersReducedMotion();
+  const [showResult, setShowResult] = useState(reduceMotion);
 
   const backdrop = useSharedValue(0);
   const playerX = useSharedValue(0);
@@ -84,7 +87,7 @@ export function BattleOverlay({
   const challengerFlyY = useSharedValue(0);
   const challengerRotate = useSharedValue(0);
   const challengerNameOpacity = useSharedValue(1);
-  const resultOpacity = useSharedValue(0);
+  const resultOpacity = useSharedValue(reduceMotion ? 1 : 0);
 
   const winnerName = playerWins ? player.name : challenger.name;
 
@@ -98,6 +101,9 @@ export function BattleOverlay({
     const koAt = hit3Done + 220;
 
     backdrop.value = withTiming(1, { duration: 280 });
+    if (reduceMotion) {
+      return;
+    }
 
     // --- Player movement ---
     // Hit 1 lunge, pause, hit 2 get shaken, pause, optional hit 3 lunge
@@ -218,6 +224,7 @@ export function BattleOverlay({
     playerWins,
     playerX,
     playerY,
+    reduceMotion,
     resultOpacity,
   ]);
 
@@ -287,7 +294,13 @@ export function BattleOverlay({
         >
           <Text style={styles.banner}>Battle</Text>
 
-          <Animated.View style={[styles.challengerSlot, challengerMoveStyle]}>
+          <Animated.View
+            style={[
+              styles.challengerSlot,
+              challengerMoveStyle,
+              reduceMotion && playerWins && styles.defeated,
+            ]}
+          >
             <Animated.View style={challengerArtStyle}>
               {challengerArt ? (
                 <Image
@@ -302,7 +315,13 @@ export function BattleOverlay({
             </Animated.Text>
           </Animated.View>
 
-          <Animated.View style={[styles.playerSlot, playerMoveStyle]}>
+          <Animated.View
+            style={[
+              styles.playerSlot,
+              playerMoveStyle,
+              reduceMotion && !playerWins && styles.defeated,
+            ]}
+          >
             <Animated.View style={playerArtStyle}>
               {playerArt ? (
                 <Image
@@ -344,6 +363,9 @@ export function BattleOverlay({
 }
 
 const styles = StyleSheet.create({
+  defeated: {
+    opacity: 0.35,
+  },
   root: {
     flex: 1,
   },
