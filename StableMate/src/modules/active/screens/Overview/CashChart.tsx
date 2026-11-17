@@ -41,10 +41,17 @@ export function CashChart() {
   const yFor = (cash: number) => TOP + plotHeight - (cash / yMax) * plotHeight;
   const bottom = yFor(0);
 
-  const line = points
-    .map((point, index) => `${index === 0 ? "M" : "L"}${xFor(point.x)},${yFor(point.cash)}`)
-    .join(" ");
-  const area = `${line} L${xFor(points[points.length - 1]!.x)},${bottom} L${xFor(0)},${bottom} Z`;
+  // A step line: cash holds level until a movement posts, then jumps. It runs
+  // on to the latest round, since cash stays put through rounds with no prize.
+  const line = [
+    ...points.map((point, index) =>
+      index === 0
+        ? `M${xFor(point.x)},${yFor(point.cash)}`
+        : `H${xFor(point.x)} V${yFor(point.cash)}`,
+    ),
+    `H${xFor(rounds)}`,
+  ].join(" ");
+  const area = `${line} V${bottom} H${xFor(0)} Z`;
   const hasData = points.length > 1;
 
   return (
