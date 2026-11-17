@@ -89,6 +89,7 @@ export function OptionsScreen() {
           </Text>
         </View>
         <Switch
+          accessibilityLabel="Network"
           value={isOnline}
           onValueChange={setIsOnline}
           trackColor={{ false: "#D6D3D1", true: "#1C1917" }}
