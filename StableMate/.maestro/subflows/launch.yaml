@@ -6,12 +6,13 @@ appId: com.wwdrew.StableMate
     clearState: true
 - openLink: exp+stablemate://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081
 - extendedWaitUntil:
-    visible: "This is the developer menu.*|Next|New development server"
+    visible: "This is the developer menu.*|Next|New development server|DEVELOPMENT SERVERS"
     timeout: 60000
-# The link can arrive before the dev launcher is ready; send it again.
+# The link can arrive before the dev launcher is ready, leaving it on its home
+# screen (worded differently per platform and launcher state); send it again.
 - runFlow:
     when:
-      visible: "New development server"
+      visible: "New development server|DEVELOPMENT SERVERS"
     commands:
       - openLink: exp+stablemate://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081
       - extendedWaitUntil:
