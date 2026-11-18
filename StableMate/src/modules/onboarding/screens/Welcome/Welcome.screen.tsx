@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { STARTER_OPTIONS } from "@/data/starters";
+import { DISPLAY_MAX_SCALE } from "@/lib/a11y";
 import { type StarterId, useGameStore } from "@/store/game";
 import { makeStyles } from "@/theme/colors";
 
@@ -83,18 +84,30 @@ export function WelcomeScreen() {
         style={styles.pager}
       >
         {SLIDES.map((slide) => (
-          <View key={slide.key} style={[styles.slide, { width: PAGE_WIDTH }]}>
-            <Text style={styles.title}>{slide.title}</Text>
+          <ScrollView
+            key={slide.key}
+            style={{ width: PAGE_WIDTH }}
+            contentContainerStyle={styles.slide}
+          >
+            <Text
+              style={styles.title}
+              accessibilityRole="header"
+              maxFontSizeMultiplier={DISPLAY_MAX_SCALE}
+            >
+              {slide.title}
+            </Text>
             <Text style={styles.body}>{slide.body}</Text>
 
             {slide.key === "select" ? (
-              <View style={styles.starterList}>
+              <View style={styles.starterList} accessibilityRole="radiogroup">
                 {STARTER_OPTIONS.map((starter) => {
                   const selected = selectedStarter === starter.id;
 
                   return (
                     <Pressable
                       key={starter.id}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: selected }}
                       onPress={() => setSelectedStarter(starter.id)}
                       style={[
                         styles.starterCard,
@@ -109,7 +122,7 @@ export function WelcomeScreen() {
                 })}
               </View>
             ) : null}
-          </View>
+          </ScrollView>
         ))}
       </ScrollView>
 
@@ -127,6 +140,7 @@ export function WelcomeScreen() {
 
         {isLastSlide ? (
           <Pressable
+            accessibilityRole="button"
             onPress={onConfirmStarter}
             disabled={!selectedStarter}
             style={[styles.button, !selectedStarter && styles.buttonDisabled]}
@@ -134,7 +148,7 @@ export function WelcomeScreen() {
             <Text style={styles.buttonLabel}>Start training</Text>
           </Pressable>
         ) : (
-          <Pressable onPress={goNext} style={styles.button}>
+          <Pressable accessibilityRole="button" onPress={goNext} style={styles.button}>
             <Text style={styles.buttonLabel}>Next</Text>
           </Pressable>
         )}
@@ -153,6 +167,7 @@ const useStyles = makeStyles((colors) => ({
   },
   slide: {
     paddingHorizontal: 24,
+    paddingBottom: 24,
   },
   title: {
     fontSize: 34,

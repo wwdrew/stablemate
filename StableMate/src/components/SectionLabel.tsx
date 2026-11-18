@@ -5,7 +5,11 @@ import { makeStyles } from "@/theme/colors";
 /** The small uppercase heading above a card's value or a group of controls. */
 export function SectionLabel({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
   const styles = useStyles();
-  return <Text style={[styles.label, style]}>{children}</Text>;
+  return (
+    <Text style={[styles.label, style]} accessibilityRole="header">
+      {children}
+    </Text>
+  );
 }
 
 const useStyles = makeStyles((colors) => ({
@@ -13,6 +17,6 @@ const useStyles = makeStyles((colors) => ({
     fontSize: 12,
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: colors.textTertiary,
+    color: colors.textSecondary,
   },
 }));

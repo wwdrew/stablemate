@@ -165,6 +165,9 @@ describe("H4 · receipts", () => {
     expect(receipt.getByText("Waiting for a buyer")).toBeOnTheScreen();
     expect(receipt.getByText("Settles when you’re back online.")).toBeOnTheScreen();
     expect(receipt.getByText("Sale settled")).toBeOnTheScreen();
+    // Steps that haven't happened say so, not just with a hollow dot.
+    expect(receipt.getByLabelText(/^Waiting for a buyer, In progress\./)).toBeOnTheScreen();
+    expect(receipt.getByLabelText("Sale settled, Not yet")).toBeOnTheScreen();
     expect(receipt.getByText(`+${usd(gengar.markPrice)}`)).toBeOnTheScreen();
     expect(receipt.getByText("Market sale · Round 0")).toBeOnTheScreen();
   });

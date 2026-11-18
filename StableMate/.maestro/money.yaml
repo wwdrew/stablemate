@@ -20,7 +20,7 @@ tags: [money]
 - assertVisible: "Sold out before your order cleared. \\$${output.price} has been refunded."
 - tapOn: "OK"
 - tapOn: "History"
-- assertVisible: "REFUND, Refund · .*, \\+\\$${output.price}, Bal .*"
+- assertVisible: "REFUND, Refund · .*, \\+\\$${output.price}, Balance .*"
 - assertVisible: "PURCHASE · FAILED, .*-\\$${output.price}.*"
 # H6: filter History to failed entries, then back to all.
 - tapOn: "Failed"
@@ -41,7 +41,7 @@ tags: [money]
 - assertVisible: "You’re offline — funds are held now and the purchase settles when you reconnect."
 - tapOn: "Buy · \\$${output.price}"
 - tapOn: "History"
-- assertVisible: "PURCHASE · PENDING, Bought .*, -\\$${output.price}, Bal .*"
+- assertVisible: "PURCHASE · PENDING, Bought .*, -\\$${output.price}, Balance .*"
 - stopApp
 - launchApp
 # Android's dev build reloads the bundle on relaunch; wait for the tab bar.
@@ -59,7 +59,7 @@ tags: [money]
     timeout: 10000
 - assertVisible: "2 Pokémon owned"
 - tapOn: "History"
-- assertVisible: "PURCHASE, Bought .*, -\\$${output.price}, Bal .*"
+- assertVisible: "PURCHASE, Bought .*, -\\$${output.price}, Balance .*"
 
 # S4: a failed sale puts the Pokémon back.
 - runFlow:
@@ -67,7 +67,7 @@ tags: [money]
     env:
       SETTLEMENT: Always fail
 - tapOn: "Stable"
-- tapOn: "(?!Squirtle).* · [0-9]+W–[0-9]+L, .*"
+- tapOn: "(?!Squirtle).*, [0-9]+ wins?, [0-9]+ loss(es)?, .*"
 - scrollUntilVisible:
     element: "Sell · .*"
 - copyTextFrom: "Sell · \\$.*"
@@ -89,7 +89,7 @@ tags: [money]
       SETTLEMENT: Always settle
 - runFlow: subflows/toggle-network.yaml
 - tapOn: "Stable"
-- tapOn: "(?!Squirtle).* · [0-9]+W–[0-9]+L, .*"
+- tapOn: "(?!Squirtle).*, [0-9]+ wins?, [0-9]+ loss(es)?, .*"
 - scrollUntilVisible:
     element: "Sell · .*"
 - tapOn: "Sell · \\$${output.mark}"
@@ -103,4 +103,4 @@ tags: [money]
     visible: "1 Pokémon owned"
     timeout: 10000
 - tapOn: "History"
-- assertVisible: "SALE, Sold .*, \\+\\$${output.mark}, Bal .*"
+- assertVisible: "SALE, Sold .*, \\+\\$${output.mark}, Balance .*"

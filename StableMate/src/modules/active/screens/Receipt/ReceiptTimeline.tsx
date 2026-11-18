@@ -10,6 +10,23 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleString();
 }
 
+/** Done and failed steps say so in their titles; the others need the state spoken. */
+const SPOKEN_STATE: Partial<Record<TimelineStep["state"], string>> = {
+  current: "In progress",
+  upcoming: "Not yet",
+};
+
+function stepLabel(step: TimelineStep): string {
+  const state = SPOKEN_STATE[step.state];
+  return [
+    state ? `${step.title}, ${state}` : step.title,
+    step.detail,
+    step.at ? formatTime(step.at) : null,
+  ]
+    .filter(Boolean)
+    .join(". ");
+}
+
 export function ReceiptTimeline({ steps }: { steps: TimelineStep[] }) {
   const styles = useStyles();
 
@@ -25,11 +42,13 @@ export function ReceiptTimeline({ steps }: { steps: TimelineStep[] }) {
               {last ? null : <View style={styles.line} />}
             </View>
             <View style={[styles.copy, last && styles.copyLast]}>
-              <Text style={[styles.title, step.state === "upcoming" && styles.titleUpcoming]}>
-                {step.title}
-              </Text>
-              {step.detail ? <Text style={styles.detail}>{step.detail}</Text> : null}
-              {step.at ? <Text style={styles.time}>{formatTime(step.at)}</Text> : null}
+              <View accessible accessibilityLabel={stepLabel(step)} style={styles.copyText}>
+                <Text style={[styles.title, step.state === "upcoming" && styles.titleUpcoming]}>
+                  {step.title}
+                </Text>
+                {step.detail ? <Text style={styles.detail}>{step.detail}</Text> : null}
+                {step.at ? <Text style={styles.time}>{formatTime(step.at)}</Text> : null}
+              </View>
               {step.linkedEntryId ? (
                 <Link
                   href={{ pathname: "/history/[entryId]", params: { entryId: step.linkedEntryId } }}
@@ -94,6 +113,9 @@ const useStyles = makeStyles((colors) => ({
     gap: 2,
     paddingBottom: 18,
   },
+  copyText: {
+    gap: 2,
+  },
   copyLast: {
     paddingBottom: 0,
   },
@@ -111,10 +133,13 @@ const useStyles = makeStyles((colors) => ({
   },
   time: {
     fontSize: 12,
-    color: colors.textTertiary,
+    color: colors.textSecondary,
   },
   link: {
-    marginTop: 4,
+    alignSelf: "flex-start",
+    // Pads the tap target to 44pt without moving the text.
+    paddingVertical: 12,
+    marginVertical: -8,
     fontSize: 14,
     fontWeight: "600",
     color: colors.accent,

@@ -1,16 +1,18 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { Link } from "expo-router";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { MarketListing } from "@/api/marketLot";
 import { useMarketLot } from "@/api/useMarketLot";
 import { EmptyState } from "@/components/EmptyState";
+import { recordLabel, useLargeText } from "@/lib/a11y";
 import { formatMoney } from "@/lib/money";
 import { formatTypes } from "@/lib/pokemon";
 import { makeStyles } from "@/theme/colors";
 
 function ListingRow({ item }: { item: MarketListing }) {
   const styles = useStyles();
+  const largeText = useLargeText();
   const record = `${item.wins}W–${item.losses}L`;
   const types = formatTypes(item.types);
 
@@ -22,17 +24,25 @@ function ListingRow({ item }: { item: MarketListing }) {
       }}
       asChild
     >
-      <Pressable style={styles.row}>
+      <Pressable style={StyleSheet.flatten([styles.row, largeText && styles.rowStacked])}>
         <View style={styles.rowCopy}>
           <Text style={styles.rowName}>{item.name}</Text>
-          <Text style={styles.rowMeta}>
+          <Text
+            style={styles.rowMeta}
+            accessibilityLabel={`${types}, ${recordLabel(item.wins, item.losses)}`}
+          >
             {types} · {record}
           </Text>
         </View>
-        <View style={styles.priceBlock}>
+        <View style={[styles.priceBlock, largeText && styles.priceBlockStacked]}>
           <Text style={styles.price}>{formatMoney(item.markPrice)}</Text>
           {item.markPrice !== item.listPrice ? (
-            <Text style={styles.listPrice}>list {formatMoney(item.listPrice)}</Text>
+            <Text
+              style={styles.listPrice}
+              accessibilityLabel={`list price ${formatMoney(item.listPrice)}`}
+            >
+              list {formatMoney(item.listPrice)}
+            </Text>
           ) : null}
         </View>
       </Pressable>
@@ -119,6 +129,13 @@ const useStyles = makeStyles((colors) => ({
     fontSize: 13,
     color: colors.textSecondary,
   },
+  rowStacked: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  priceBlockStacked: {
+    alignItems: "flex-start",
+  },
   priceBlock: {
     alignItems: "flex-end",
     gap: 2,
@@ -130,7 +147,7 @@ const useStyles = makeStyles((colors) => ({
   },
   listPrice: {
     fontSize: 12,
-    color: colors.textTertiary,
+    color: colors.textSecondary,
   },
   separator: {
     height: 10,

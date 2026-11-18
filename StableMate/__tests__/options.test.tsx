@@ -56,3 +56,18 @@ test("OP3 · cancelling the reset keeps the game", async () => {
   expect(button(buttons, "Reset").style).toBe("destructive");
   expect(useGameStore.getState().state).not.toBeNull();
 });
+
+test("OP4 · the network row is one switch", async () => {
+  useGameStore.getState().createState("squirtle");
+  await renderApp("/options");
+  const network = withinTab("options").getByRole("switch", { name: "Simulate network" });
+  expect(network).toBeChecked();
+
+  await fireEvent.press(network);
+
+  expect(useSettingsStore.getState().isOnline).toBe(false);
+  expect(withinTab("options").getByRole("switch", { name: "Simulate network" })).not.toBeChecked();
+  expect(
+    withinTab("options").getByText("Offline — buys and sales queue until you go online."),
+  ).toBeOnTheScreen();
+});

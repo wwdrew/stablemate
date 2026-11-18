@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import type { ReactNode } from "react";
 import { ScrollView, Text, View } from "react-native";
 
+import { recordLabel } from "@/lib/a11y";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import { formatTypes } from "@/lib/pokemon";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
@@ -57,14 +58,21 @@ export function PokemonDetailScreen({
         )}
       </View>
 
-      <Text style={styles.name}>{pokemon.name}</Text>
-      <Text style={styles.meta}>
+      <Text style={styles.name} accessibilityRole="header">
+        {pokemon.name}
+      </Text>
+      <Text
+        style={styles.meta}
+        accessibilityLabel={`${types}, ${recordLabel(pokemon.wins, pokemon.losses)}`}
+      >
         {types} · {record}
       </Text>
       <Text style={styles.markPrice}>{formatMoney(pokemon.markPrice)}</Text>
 
       <View style={styles.stats}>
-        <Text style={styles.statsHeading}>Base stats</Text>
+        <Text style={styles.statsHeading} accessibilityRole="header">
+          Base stats
+        </Text>
         {STAT_ROWS.map((row) => (
           <View key={row.key} style={styles.statRow}>
             <Text style={styles.statLabel}>{row.label}</Text>
@@ -79,7 +87,9 @@ export function PokemonDetailScreen({
 
       {battleHistory ? (
         <View style={styles.history}>
-          <Text style={styles.statsHeading}>Your battle history</Text>
+          <Text style={styles.statsHeading} accessibilityRole="header">
+            Your battle history
+          </Text>
           <Text style={styles.historyHint}>
             Record above can include form from before you owned them. This list
             is only battles you’ve fought.

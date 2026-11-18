@@ -12,6 +12,7 @@ The game is the hook; the transaction model is the point.
 | Offline / optimistic behaviour | [`src/api/useSettlementQueue.ts`](StableMate/src/api/useSettlementQueue.ts), [`src/api/settlement.ts`](StableMate/src/api/settlement.ts) |
 | Global state | [`src/store/`](StableMate/src/store): two persisted Zustand stores |
 | Tests | [`__tests__/`](StableMate/__tests__), [`test/fixtures.ts`](StableMate/test/fixtures.ts), [`TEST_SCENARIOS.md`](TEST_SCENARIOS.md) |
+| Accessibility | [`src/lib/a11y.ts`](StableMate/src/lib/a11y.ts) and [`TEST_SCENARIOS.md`](TEST_SCENARIOS.md#8-accessibility): spoken labels, announcements, large-text layouts |
 | Something fun | [`BattleOverlay.tsx`](StableMate/src/modules/active/screens/PokemonDetail/BattleOverlay.tsx): a Reanimated battle sequence |
 
 ## Demo script (about 3 minutes)

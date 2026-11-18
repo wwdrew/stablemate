@@ -8,7 +8,7 @@ import { formatMoney } from "@/lib/money";
 import { useLedger, useRoundsPlayed } from "@/store/game";
 import { makeStyles, useColors } from "@/theme/colors";
 
-import { cashSeries, niceTicks, roundLabelStep } from "./cashChartModel";
+import { cashSeries, chartSummary, niceTicks, roundLabelStep } from "./cashChartModel";
 
 const HEIGHT = 200;
 const LEFT = 52;
@@ -62,7 +62,10 @@ export function CashChart() {
       <View
         style={styles.plot}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-        accessibilityLabel={`Cash over ${points.length - 1} transactions and ${rounds} rounds`}
+        // One image with a spoken summary; the empty-state text stays readable on its own.
+        accessible={hasData}
+        accessibilityRole={hasData ? "image" : undefined}
+        accessibilityLabel={hasData ? chartSummary(points, rounds) : undefined}
       >
         {width > 0 ? (
           <Svg width={width} height={HEIGHT}>
@@ -84,7 +87,7 @@ export function CashChart() {
                 y={yFor(value) + LABEL_SIZE / 3}
                 fontSize={LABEL_SIZE}
                 textAnchor="end"
-                fill={colors.textTertiary}
+                fill={colors.textSecondary}
               >
                 {formatMoney(value)}
               </SvgText>
@@ -111,7 +114,7 @@ export function CashChart() {
                   y={bottom + TICK + LABEL_SIZE + 2}
                   fontSize={LABEL_SIZE}
                   textAnchor="middle"
-                  fill={colors.textTertiary}
+                  fill={colors.textSecondary}
                 >
                   {round}
                 </SvgText>
@@ -153,7 +156,7 @@ const useStyles = makeStyles((colors) => ({
   axisTitle: {
     alignSelf: "center",
     fontSize: LABEL_SIZE,
-    color: colors.textTertiary,
+    color: colors.textSecondary,
   },
   empty: {
     position: "absolute",

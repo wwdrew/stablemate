@@ -2,5 +2,5 @@
 appId: com.wwdrew.StableMate
 ---
 - tapOn: "Options"
-- tapOn: "Network"
+- tapOn: "Simulate network"
 - tapOn: "Overview"

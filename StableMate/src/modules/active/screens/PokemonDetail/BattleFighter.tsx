@@ -2,6 +2,8 @@ import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
+import { DISPLAY_MAX_SCALE } from "@/lib/a11y";
+
 import type { FighterMotion } from "./battleMotion";
 
 type BattleFighterProps = {
@@ -53,7 +55,10 @@ export function BattleFighter({ name, sprites, motion, side, defeated }: BattleF
           />
         ) : null}
       </Animated.View>
-      <Animated.Text style={[isPlayer ? styles.playerName : styles.challengerName, nameStyle]}>
+      <Animated.Text
+        style={[isPlayer ? styles.playerName : styles.challengerName, nameStyle]}
+        maxFontSizeMultiplier={DISPLAY_MAX_SCALE}
+      >
         {name}
       </Animated.Text>
     </Animated.View>

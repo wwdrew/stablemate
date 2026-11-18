@@ -1,4 +1,4 @@
-import { Alert, Pressable, Switch, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Card } from "@/components/Card";
@@ -52,25 +52,40 @@ export function OptionsScreen() {
     );
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + 16 }]}>
-      <Text style={styles.title}>Options</Text>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={[
+        styles.screen,
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 96 },
+      ]}
+    >
+      <Text style={styles.title} accessibilityRole="header">
+        Options
+      </Text>
       <Text style={styles.subtitle}>Demo controls and game settings.</Text>
 
-      <Card style={styles.row}>
-        <View style={styles.rowCopy}>
-          <Text style={styles.rowTitle}>Simulate network</Text>
-          <Text style={styles.rowBody}>
-            {isOnline
-              ? "Online — buys and sales settle in a moment."
-              : "Offline — buys and sales queue until you go online."}
-          </Text>
-        </View>
-        <Switch
-          accessibilityLabel="Network"
-          value={isOnline}
-          onValueChange={setIsOnline}
-          trackColor={{ false: colors.fill, true: colors.accent }}
-        />
+      <Card style={styles.networkCard}>
+        {/* The whole line is one switch, like a Settings row: tap anywhere, read once. */}
+        <Pressable
+          accessibilityRole="switch"
+          accessibilityState={{ checked: isOnline }}
+          onPress={() => setIsOnline(!isOnline)}
+          style={styles.row}
+        >
+          <Text style={[styles.rowTitle, styles.rowCopy]}>Simulate network</Text>
+          <Switch
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            value={isOnline}
+            onValueChange={setIsOnline}
+            trackColor={{ false: colors.fill, true: colors.accent }}
+          />
+        </Pressable>
+        <Text style={styles.rowBody}>
+          {isOnline
+            ? "Online — buys and sales settle in a moment."
+            : "Offline — buys and sales queue until you go online."}
+        </Text>
       </Card>
 
       <View style={styles.section}>
@@ -93,21 +108,28 @@ export function OptionsScreen() {
 
       <View style={styles.section}>
         <SectionLabel>Danger zone</SectionLabel>
-        <Pressable onPress={confirmReset} style={styles.dangerButton}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityHint="Asks for confirmation first."
+          onPress={confirmReset}
+          style={styles.dangerButton}
+        >
           <Text style={styles.dangerLabel}>Reset game</Text>
           <Text style={styles.dangerHint}>
             Clears your stable and returns to onboarding.
           </Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const useStyles = makeStyles((colors) => ({
-  screen: {
+  scroll: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  screen: {
     paddingHorizontal: 20,
     gap: 16,
   },
@@ -126,9 +148,11 @@ const useStyles = makeStyles((colors) => ({
     alignItems: "center",
     gap: 16,
   },
+  networkCard: {
+    gap: 4,
+  },
   rowCopy: {
     flex: 1,
-    gap: 4,
   },
   rowTitle: {
     fontSize: 16,

@@ -105,7 +105,7 @@ const useStyles = makeStyles((colors) => ({
     color: colors.text,
   },
   heroAmountFailed: {
-    color: colors.textTertiary,
+    color: colors.textSecondary,
     textDecorationLine: "line-through",
   },
   heroSubtitle: {

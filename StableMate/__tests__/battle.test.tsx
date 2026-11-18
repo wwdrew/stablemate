@@ -1,4 +1,5 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
+import { AccessibilityInfo } from "react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
 import * as battle from "@/lib/battle";
@@ -42,6 +43,7 @@ async function fightAndContinue() {
 
 test("B1 · a win pays the prize and records the win", async () => {
   useSettingsStore.setState({ battleOutcome: "win" });
+  const announce = jest.spyOn(AccessibilityInfo, "announceForAccessibility");
   await renderApp("/stable/squirtle-starter");
 
   await fireEvent.press(screen.getByText("Battle"));
@@ -49,10 +51,12 @@ test("B1 · a win pays the prize and records the win", async () => {
 
   expect(screen.getByText("Squirtle wins")).toBeOnTheScreen();
   expect(screen.getByText(`Prize +${usd(prize)}`)).toBeOnTheScreen();
+  expect(announce).toHaveBeenCalledWith(`Squirtle wins. Prize +${usd(prize)}.`);
   await fireEvent.press(screen.getByText("Continue"));
 
   const detail = withinScreenContaining("Base stats");
   expect(detail.getByText("Water · 1W–0L")).toBeOnTheScreen();
+  expect(detail.getByLabelText("Water, 1 win, 0 losses")).toBeOnTheScreen();
   expect(detail.getByText("$459")).toBeOnTheScreen();
   expect(detail.getByText("Round 1 · vs Onix")).toBeOnTheScreen();
   expect(detail.getByText(`Win · +${usd(prize)}`)).toBeOnTheScreen();

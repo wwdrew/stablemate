@@ -82,3 +82,17 @@ test("O5 · changing the selection before confirming uses the last pick", async 
   expect(withinTab("(overview)").getByText("Charmander")).toBeOnTheScreen();
   expect(screen.queryByText("Bulbasaur")).not.toBeOnTheScreen();
 });
+
+test("O6 · starters are radio buttons with headed slides", async () => {
+  await goToStarterSlide();
+
+  expect(screen.getByRole("header", { name: "Choose your starter" })).toBeOnTheScreen();
+  expect(screen.getAllByRole("radio")).toHaveLength(3);
+  expect(screen.getByRole("button", { name: "Start training" })).toBeDisabled();
+
+  await fireEvent.press(screen.getByText("Charmander"));
+
+  expect(screen.getByRole("radio", { name: /^Charmander/ })).toBeChecked();
+  expect(screen.getByRole("radio", { name: /^Squirtle/ })).not.toBeChecked();
+  expect(screen.getByRole("button", { name: "Start training" })).toBeEnabled();
+});

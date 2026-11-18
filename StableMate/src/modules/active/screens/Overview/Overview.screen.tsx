@@ -1,6 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/data/starters";
+import { useLargeText } from "@/lib/a11y";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import {
   useCash,
@@ -16,6 +17,7 @@ import { StatCard } from "./StatCard";
 
 export function OverviewScreen() {
   const styles = useStyles();
+  const largeText = useLargeText();
   const starterId = useGameStore((store) => store.state?.starterId);
   const stableSize = useGameStore((store) => store.state?.stable.length ?? 0);
   const cash = useCash();
@@ -37,9 +39,9 @@ export function OverviewScreen() {
         Wallet and stable at a glance. Cash movements live in History.
       </Text>
 
-      <View style={styles.row}>
-        <StatCard label="Cash" value={formatMoney(cash)} style={styles.half} />
-        <StatCard label="Rounds played" value={String(roundsPlayed)} style={styles.half} />
+      <View style={largeText ? styles.stack : styles.row}>
+        <StatCard label="Cash" value={formatMoney(cash)} style={largeText ? undefined : styles.half} />
+        <StatCard label="Rounds played" value={String(roundsPlayed)} style={largeText ? undefined : styles.half} />
       </View>
 
       <StatCard
@@ -73,6 +75,9 @@ const useStyles = makeStyles((colors) => ({
   },
   row: {
     flexDirection: "row",
+    gap: 12,
+  },
+  stack: {
     gap: 12,
   },
   half: {

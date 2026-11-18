@@ -1,3 +1,4 @@
+import { formatMoney } from "@/lib/money";
 import type { LedgerEntry } from "@/store/game";
 
 /** A posted balance, positioned in rounds: `x = 3` is the end of round 3. */
@@ -65,4 +66,16 @@ export function niceTicks(max: number, target = 4): number[] {
 /** Which rounds get a number under their tick, so labels don't collide. */
 export function roundLabelStep(rounds: number, maxLabels = 8): number {
   return [1, 2, 5, 10, 20, 50, 100].find((step) => rounds / step <= maxLabels) ?? 100;
+}
+
+/** What the chart shows, in words, for screen readers. */
+export function chartSummary(points: readonly CashPoint[], rounds: number): string {
+  const cash = points.map((point) => point.cash);
+  const movements = points.length - 1;
+  return [
+    `Cash chart over ${rounds} ${rounds === 1 ? "round" : "rounds"}`,
+    `now ${formatMoney(cash[cash.length - 1]!)}`,
+    `highest ${formatMoney(Math.max(...cash))}`,
+    `${movements} cash ${movements === 1 ? "movement" : "movements"}`,
+  ].join(", ");
 }

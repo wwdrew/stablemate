@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { MarketListing } from "@/api/marketLot";
 import { EmptyState } from "@/components/EmptyState";
+import { useAnnouncement } from "@/lib/a11y";
 import { formatMoney } from "@/lib/money";
 import { BuyAction } from "@/modules/active/screens/PokemonDetail/BuyAction";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
@@ -74,6 +75,12 @@ export function ListingDetailScreen({ listing, isLoading }: ListingDetailScreenP
   const [failureReason, setFailureReason] = useState<PurchaseFailure | null>(null);
 
   const pokemon = listing ? pokemonFromListing(listing) : null;
+  // A refused purchase leaves focus on the button, so say why.
+  useAnnouncement(
+    failureReason && listing
+      ? failureReasonMessage(failureReason, cash, listing.markPrice)
+      : null,
+  );
 
   if (isLoading) {
     return <EmptyState fill body="Loading…" />;

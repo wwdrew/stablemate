@@ -1,5 +1,6 @@
 import {
   cashSeries,
+  chartSummary,
   niceTicks,
   roundLabelStep,
 } from "@/modules/active/screens/Overview/cashChartModel";
@@ -67,4 +68,18 @@ test("round labels thin out as rounds pile up", () => {
   expect(roundLabelStep(6)).toBe(1);
   expect(roundLabelStep(12)).toBe(2);
   expect(roundLabelStep(30)).toBe(5);
+});
+
+test("the chart summary reads the latest and highest cash", () => {
+  const points = [
+    { x: 0, cash: 0 },
+    { x: 1, cash: 150 },
+    { x: 1.5, cash: 30 },
+  ];
+  expect(chartSummary(points, 2)).toBe(
+    "Cash chart over 2 rounds, now $30, highest $150, 2 cash movements",
+  );
+  expect(chartSummary(points.slice(0, 2), 1)).toBe(
+    "Cash chart over 1 round, now $150, highest $150, 1 cash movement",
+  );
 });

@@ -29,7 +29,7 @@ Assertions read the text the user sees, so a test also checks the copy. Notes:
 3. **`textTransform` text.** RNTL matches the *source* string; Maestro sees the *rendered* one (verified). This affects uppercase labels: ledger types (`PRIZE`, `PURCHASE · PENDING`), Overview card labels, and the stable badge (`BUYING · PENDING`). Pokémon types are capitalised in JS (`formatTypes`), not with `textTransform`, because iOS `capitalize` also lowercased the record (`1w–0l`).
 4. **Curly apostrophes.** Several strings use `’` (e.g. `This round’s market lot`, `You can’t sell your last Pokémon.`). Copy them exactly, or match with `.*` / a regex.
 5. **Dynamic values** (prize, listing price, cash). RNTL pins them with spies (`pickChallenger`) or seeded store state, then asserts the computed string. Maestro reads them with `copyTextFrom` (e.g. `Prize \+\$\d+`), pulls the number out with `evalScript: ${output.prize = maestro.copiedText.match(/[0-9][0-9,]*/)[0]}`, then asserts `\$${output.prize}`. A literal `$` inside `${…}` breaks Maestro's parser, hence the regex.
-6. **Grouped labels (Maestro).** A pressable row or card is one accessibility element whose label joins its texts with `, `, e.g. `Squirtle, Water · 1W–0L, $459` or `PRIZE, Battle prize, Squirtle beat Onix, +$157, Bal $157`. Maestro text selectors match the whole label as a regex, so use `Squirtle, .*`-style patterns.
+6. **Grouped labels (Maestro).** A pressable row or card is one accessibility element whose label joins its texts with `, `, e.g. `Squirtle, Water, 1 win, 0 losses, $459` or `PRIZE, Battle prize, Squirtle beat Onix, +$157, Balance $157`. Records and balances have spoken labels (`1 win, 0 losses`, `Balance`), so the label differs from the visible `1W–0L` and `Bal`. Maestro text selectors match the whole label as a regex, so use `Squirtle, .*`-style patterns.
 7. **Lists (RNTL).** `LegendList` is mapped to `FlatList` in `jest.setup.ts`. LegendList renders no rows without measured layout, and FlatList renders its first 10 rows. Long-list scenarios must scroll or keep the ledger short.
 
 ### RNTL harness
@@ -124,11 +124,11 @@ Setup for all: O4 with Squirtle.
 - Stable → Squirtle → `Battle`
 - Expect overlay: `Squirtle wins`, `Prize +$<p>`, `Continue`
 - Continue → expect:
-  - Detail: record `1W–0L` (regex — see type casing note), mark price `$459`
+  - Detail: record `1W–0L`, read aloud as `Water, 1 win, 0 losses`; mark price `$459`
   - Battle history row `Round 1 · vs <challenger>`, `Win · +$<p>`, `W`
   - Overview: Cash `$<p>`, Rounds `1`, Net worth `$<p + 459>`
   - History: 1 row with type `Prize`, `Battle prize`, `Squirtle beat <challenger>`, `+$<p>`, `Bal $<p>`; balance card `$<p>`, `1 transaction`
-  - Chart: accessibility label `Cash over 1 transactions and 1 rounds`
+  - Screen reader hears `Squirtle wins. Prize +$<p>.` when the result appears
 - Maestro: read `<p>` with `copyTextFrom: "Prize \\+\\$\\d+"`, then assert it shows up in History and Overview
 
 **B2 · Loss** [Both] ✅ RNTL · Maestro
@@ -306,7 +306,7 @@ Setup for all: O4 with Squirtle.
 
 **OV2 · Chart points** [unit] ✅ `cashChartModel.test.ts`
 - `cashSeries`: prizes land at the end of their round, trades are spread between battles, pending entries aren't plotted, and a late-settling sale never moves the line backwards
-- Accessibility label `Cash over N transactions and R rounds`, where N = posted ledger entries
+- `chartSummary`: the chart is one image to screen readers, read as `Cash chart over R rounds, now $X, highest $Y, N cash movements`
 
 **OV3 · Chart axes** [unit] ✅ `cashChartModel.test.ts`
 - `niceTicks`: round-number steps from $0 (cash can't go negative, so $0 is the bottom)
@@ -333,7 +333,26 @@ Setup for all: O4 with Squirtle.
 
 ---
 
-## 8. Full-journey smoke (E2E)
+## 8. Accessibility
+
+**A1 · Screen reader names and states** [RNTL] ✅ RNTL
+- Starters are radio buttons in a radio group; picking one checks it and enables `Start training` (O6)
+- Slide titles, section labels and detail-screen headings are headers
+- Records read as words (`1 win, 0 losses`), `Bal` reads as `Balance`, the network switch is `Simulate network`
+- Receipt timeline steps say `In progress` or `Not yet` instead of relying on the dot colour (H4)
+- The battle result and a refused purchase are announced, since focus is elsewhere when they appear (B1)
+
+**A2 · Largest text sizes** [manual, iOS AX5]
+- Side-by-side layouts stack (Overview stat cards, Stable / Buy / History rows, segmented controls); no word breaks mid-way
+- Options and every onboarding slide scroll, so `Reset game` and the starters stay reachable
+- Display text that would break mid-word (onboarding titles, the battle stage) stops growing at 1.5×
+
+**A3 · Contrast**
+- Informational text uses the secondary label colour; tertiary is left for disabled and not-yet states. System colours also pick up Increase Contrast.
+
+---
+
+## 9. Full-journey smoke (E2E)
 
 **J1** — `start-game` (Squirtle) → `Always win`, `Always settle` → `earn-cash` → buy first listing → battle with it → sell it → verify:
 - History has 7 prizes (6 from `earn-cash` + 1), 1 purchase, 1 sale; all settled

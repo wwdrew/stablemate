@@ -2,6 +2,7 @@ import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
+import { recordLabel, useLargeText } from "@/lib/a11y";
 import { formatMoney } from "@/lib/money";
 import { formatTypes } from "@/lib/pokemon";
 import { type OwnedPokemon, useStable } from "@/store/game";
@@ -9,8 +10,10 @@ import { makeStyles } from "@/theme/colors";
 
 function StableRow({ item }: { item: OwnedPokemon }) {
   const styles = useStyles();
+  const largeText = useLargeText();
   const species = getSpeciesBySlug(item.speciesId);
   const record = `${item.wins}W–${item.losses}L`;
+  const types = species ? formatTypes(species.types) : "—";
   const pendingLabel =
     item.pending?.type === "sale"
       ? "Selling · pending"
@@ -27,14 +30,21 @@ function StableRow({ item }: { item: OwnedPokemon }) {
       asChild
     >
       <Pressable
-        style={StyleSheet.flatten([styles.row, pendingLabel && styles.rowPending])}
+        style={StyleSheet.flatten([
+          styles.row,
+          pendingLabel && styles.rowPending,
+          largeText && styles.rowStacked,
+        ])}
       >
         <View style={styles.rowCopy}>
           <Text style={styles.rowName}>
             {species?.name ?? item.speciesId}
           </Text>
-          <Text style={styles.rowMeta}>
-            {species ? formatTypes(species.types) : "—"} · {record}
+          <Text
+            style={styles.rowMeta}
+            accessibilityLabel={`${types}, ${recordLabel(item.wins, item.losses)}`}
+          >
+            {types} · {record}
           </Text>
           {pendingLabel ? (
             <Text style={styles.rowPendingLabel}>{pendingLabel}</Text>
@@ -124,6 +134,10 @@ const useStyles = makeStyles((colors) => ({
   rowMeta: {
     fontSize: 13,
     color: colors.textSecondary,
+  },
+  rowStacked: {
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
   rowPrice: {
     fontSize: 17,

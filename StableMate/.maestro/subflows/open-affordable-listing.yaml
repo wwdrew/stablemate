@@ -4,7 +4,7 @@ appId: com.wwdrew.StableMate
 ---
 - tapOn: "Buy"
 - tapOn:
-    text: ".* · [0-9]+W–[0-9]+L, \\$.*"
+    text: ".*, [0-9]+ wins?, [0-9]+ loss(es)?, \\$.*"
     index: 0
 # The buy button (and any "Insufficient funds" note above it) can sit below the fold.
 - scrollUntilVisible:
@@ -17,7 +17,7 @@ appId: com.wwdrew.StableMate
       - runFlow: battle.yaml
       - tapOn: "Buy"
       - tapOn:
-          text: ".* · [0-9]+W–[0-9]+L, \\$.*"
+          text: ".*, [0-9]+ wins?, [0-9]+ loss(es)?, \\$.*"
           index: 0
       - scrollUntilVisible:
           element: "Buy · .*"

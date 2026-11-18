@@ -7,6 +7,7 @@ import { Card } from "@/components/Card";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionLabel } from "@/components/SectionLabel";
 import { type SegmentOption, SegmentedControl } from "@/components/SegmentedControl";
+import { useLargeText } from "@/lib/a11y";
 import { filterLedger, type LedgerFilter, statusLabel, typeLabel } from "@/lib/ledger";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import {
@@ -32,6 +33,7 @@ const FILTER_EMPTY_COPY: Record<Exclude<LedgerFilter, "all">, string> = {
 
 function TransactionRow({ item }: { item: LedgerEntry }) {
   const styles = useStyles();
+  const largeText = useLargeText();
   const positive = item.amount > 0;
   const status = statusLabel(item.status);
 
@@ -47,6 +49,7 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
         style={StyleSheet.flatten([
           styles.row,
           item.status === "pending" && styles.rowPending,
+          largeText && styles.rowStacked,
         ])}
       >
         <View style={styles.rowCopy}>
@@ -65,7 +68,7 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
           <Text style={styles.rowTitle}>{item.title}</Text>
           <Text style={styles.rowSubtitle}>{item.subtitle}</Text>
         </View>
-        <View style={styles.amounts}>
+        <View style={[styles.amounts, largeText && styles.amountsStacked]}>
           <Text
             style={[
               styles.amount,
@@ -77,7 +80,12 @@ function TransactionRow({ item }: { item: LedgerEntry }) {
             {formatSignedMoney(item.amount)}
           </Text>
           {item.balanceAfter !== null ? (
-            <Text style={styles.balance}>Bal {formatMoney(item.balanceAfter)}</Text>
+            <Text
+              style={styles.balance}
+              accessibilityLabel={`Balance ${formatMoney(item.balanceAfter)}`}
+            >
+              Bal {formatMoney(item.balanceAfter)}
+            </Text>
           ) : null}
         </View>
       </Pressable>
@@ -205,7 +213,7 @@ const useStyles = makeStyles((colors) => ({
     fontSize: 11,
     letterSpacing: 0.7,
     textTransform: "uppercase",
-    color: colors.textTertiary,
+    color: colors.textSecondary,
     fontWeight: "600",
   },
   rowTitle: {
@@ -216,6 +224,13 @@ const useStyles = makeStyles((colors) => ({
   rowSubtitle: {
     fontSize: 13,
     color: colors.textSecondary,
+  },
+  rowStacked: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  amountsStacked: {
+    alignItems: "flex-start",
   },
   amounts: {
     alignItems: "flex-end",
@@ -232,15 +247,15 @@ const useStyles = makeStyles((colors) => ({
     color: colors.text,
   },
   amountPending: {
-    color: colors.textTertiary,
+    color: colors.textSecondary,
   },
   amountFailed: {
-    color: colors.textTertiary,
+    color: colors.textSecondary,
     textDecorationLine: "line-through",
   },
   balance: {
     fontSize: 12,
-    color: colors.textTertiary,
+    color: colors.textSecondary,
   },
   separator: {
     height: 10,

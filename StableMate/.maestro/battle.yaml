@@ -24,14 +24,14 @@ tags: [smoke]
 - tapOn: "Continue"
 # Scroll back up to the record; Android's detail is a full page, so it may be off screen.
 - scrollUntilVisible:
-    element: "Water · 1W–0L"
+    element: "Water, 1 win, 0 losses"
     direction: UP
 - assertVisible: "\\$459"
 - assertVisible: "Win · \\+\\$${output.prize}"
 - runFlow: subflows/close-modal.yaml
 
 - tapOn: "History"
-- assertVisible: "PRIZE, Battle prize, Squirtle beat .*, \\+\\$${output.prize}, Bal \\$${output.prize}"
+- assertVisible: "PRIZE, Battle prize, Squirtle beat .*, \\+\\$${output.prize}, Balance \\$${output.prize}"
 - assertVisible: "1 transaction"
 - tapOn: "Overview"
 - assertVisible: "\\$${output.prize}"
@@ -53,7 +53,7 @@ tags: [smoke]
 - tapOn: "Continue"
 # Scroll back up to the record; Android's detail is a full page, so it may be off screen.
 - scrollUntilVisible:
-    element: "Water · 1W–1L"
+    element: "Water, 1 win, 1 loss"
     direction: UP
 - assertVisible: "\\$433"
 - runFlow: subflows/close-modal.yaml
@@ -72,5 +72,5 @@ tags: [smoke]
     timeout: 90000
 - tapOn: "Stable"
 - extendedWaitUntil:
-    visible: "Squirtle, Water · 1W–2L, .*"
+    visible: "Squirtle, Water, 1 win, 2 losses, .*"
     timeout: 30000

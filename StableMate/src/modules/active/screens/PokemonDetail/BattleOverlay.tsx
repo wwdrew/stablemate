@@ -8,6 +8,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogSpecies } from "@/data/catalog.schema";
+import { DISPLAY_MAX_SCALE, useAnnouncement } from "@/lib/a11y";
 import { formatSignedMoney } from "@/lib/money";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
@@ -31,6 +32,7 @@ export function BattleOverlay({
   onFinished,
 }: BattleOverlayProps) {
   const insets = useSafeAreaInsets();
+  // The stage is laid out at fixed positions, so its text stops growing at 1.5×.
   // With Reduce Motion on, skip the fight: show the result at once and dim the loser.
   const reduceMotion = usePrefersReducedMotion();
   const [showResult, setShowResult] = useState(reduceMotion);
@@ -41,6 +43,8 @@ export function BattleOverlay({
   const challengerMotion = useFighterMotion();
 
   const winnerName = playerWins ? player.name : challenger.name;
+  const prizeCopy = playerWins ? `Prize ${formatSignedMoney(prizeMoney)}` : "No prize this round";
+  useAnnouncement(showResult ? `${winnerName} wins. ${prizeCopy}.` : null);
 
   useEffect(() => {
     backdrop.value = withTiming(1, { duration: 280 });
@@ -85,7 +89,7 @@ export function BattleOverlay({
             },
           ]}
         >
-          <Text style={styles.banner}>Battle</Text>
+          <Text style={styles.banner} maxFontSizeMultiplier={DISPLAY_MAX_SCALE}>Battle</Text>
 
           <BattleFighter
             side="challenger"
@@ -104,12 +108,8 @@ export function BattleOverlay({
 
           {showResult ? (
             <Animated.View style={[styles.resultCard, resultStyle]}>
-              <Text style={styles.resultTitle}>{winnerName} wins</Text>
-              {playerWins ? (
-                <Text style={styles.resultPrize}>Prize {formatSignedMoney(prizeMoney)}</Text>
-              ) : (
-                <Text style={styles.resultPrize}>No prize this round</Text>
-              )}
+              <Text style={styles.resultTitle} maxFontSizeMultiplier={DISPLAY_MAX_SCALE}>{winnerName} wins</Text>
+              <Text style={styles.resultPrize} maxFontSizeMultiplier={DISPLAY_MAX_SCALE}>{prizeCopy}</Text>
               <Pressable
                 accessibilityRole="button"
                 onPress={onFinished}
@@ -118,7 +118,7 @@ export function BattleOverlay({
                   pressed && styles.continuePressed,
                 ]}
               >
-                <Text style={styles.continueLabel}>Continue</Text>
+                <Text style={styles.continueLabel} maxFontSizeMultiplier={DISPLAY_MAX_SCALE}>Continue</Text>
               </Pressable>
             </Animated.View>
           ) : null}
