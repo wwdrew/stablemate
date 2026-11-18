@@ -5,16 +5,15 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-nati
 import type { MarketListing } from "@/api/marketLot";
 import { useMarketLot } from "@/api/useMarketLot";
 import { EmptyState } from "@/components/EmptyState";
-import { recordLabel, useLargeText } from "@/lib/a11y";
+import { useLargeText } from "@/lib/a11y";
 import { formatMoney } from "@/lib/money";
-import { formatTypes } from "@/lib/pokemon";
+import { formatTypes, typesAndRecord } from "@/lib/pokemon";
 import { makeStyles } from "@/theme/colors";
 
 function ListingRow({ item }: { item: MarketListing }) {
   const styles = useStyles();
   const largeText = useLargeText();
-  const record = `${item.wins}W–${item.losses}L`;
-  const types = formatTypes(item.types);
+  const meta = typesAndRecord(formatTypes(item.types), item.wins, item.losses);
 
   return (
     <Link
@@ -29,9 +28,9 @@ function ListingRow({ item }: { item: MarketListing }) {
           <Text style={styles.rowName}>{item.name}</Text>
           <Text
             style={styles.rowMeta}
-            accessibilityLabel={`${types}, ${recordLabel(item.wins, item.losses)}`}
+            accessibilityLabel={meta.label}
           >
-            {types} · {record}
+            {meta.text}
           </Text>
         </View>
         <View style={[styles.priceBlock, largeText && styles.priceBlockStacked]}>

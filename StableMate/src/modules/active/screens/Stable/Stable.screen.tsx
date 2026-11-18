@@ -2,9 +2,9 @@ import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getSpeciesBySlug } from "@/data/catalog";
-import { recordLabel, useLargeText } from "@/lib/a11y";
+import { useLargeText } from "@/lib/a11y";
 import { formatMoney } from "@/lib/money";
-import { formatTypes } from "@/lib/pokemon";
+import { formatTypes, typesAndRecord } from "@/lib/pokemon";
 import { type OwnedPokemon, useStable } from "@/store/game";
 import { makeStyles } from "@/theme/colors";
 
@@ -12,8 +12,11 @@ function StableRow({ item }: { item: OwnedPokemon }) {
   const styles = useStyles();
   const largeText = useLargeText();
   const species = getSpeciesBySlug(item.speciesId);
-  const record = `${item.wins}W–${item.losses}L`;
-  const types = species ? formatTypes(species.types) : "—";
+  const meta = typesAndRecord(
+    species ? formatTypes(species.types) : "—",
+    item.wins,
+    item.losses,
+  );
   const pendingLabel =
     item.pending?.type === "sale"
       ? "Selling · pending"
@@ -42,9 +45,9 @@ function StableRow({ item }: { item: OwnedPokemon }) {
           </Text>
           <Text
             style={styles.rowMeta}
-            accessibilityLabel={`${types}, ${recordLabel(item.wins, item.losses)}`}
+            accessibilityLabel={meta.label}
           >
-            {types} · {record}
+            {meta.text}
           </Text>
           {pendingLabel ? (
             <Text style={styles.rowPendingLabel}>{pendingLabel}</Text>

@@ -2,9 +2,8 @@ import { Image } from "expo-image";
 import type { ReactNode } from "react";
 import { ScrollView, Text, View } from "react-native";
 
-import { recordLabel } from "@/lib/a11y";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
-import { formatTypes } from "@/lib/pokemon";
+import { formatTypes, typesAndRecord } from "@/lib/pokemon";
 import type { PokemonInstance } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import type { BattleRecord } from "@/store/game";
 import { makeStyles } from "@/theme/colors";
@@ -34,8 +33,7 @@ export function PokemonDetailScreen({
 }: PokemonDetailScreenProps) {
   const styles = useStyles();
   const artwork = pokemon.sprites.artwork ?? pokemon.sprites.default;
-  const types = formatTypes(pokemon.types);
-  const record = `${pokemon.wins}W–${pokemon.losses}L`;
+  const meta = typesAndRecord(formatTypes(pokemon.types), pokemon.wins, pokemon.losses);
 
   return (
     <ScrollView
@@ -63,9 +61,9 @@ export function PokemonDetailScreen({
       </Text>
       <Text
         style={styles.meta}
-        accessibilityLabel={`${types}, ${recordLabel(pokemon.wins, pokemon.losses)}`}
+        accessibilityLabel={meta.label}
       >
-        {types} · {record}
+        {meta.text}
       </Text>
       <Text style={styles.markPrice}>{formatMoney(pokemon.markPrice)}</Text>
 
