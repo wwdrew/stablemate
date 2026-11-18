@@ -96,10 +96,22 @@ Species data is a 30-Pokémon snapshot from [PokéAPI](https://pokeapi.co), chec
 ## Known limitations
 
 - **Money is whole dollars.** Amounts are integers, but not minor units (cents). Display goes through one `formatMoney` helper (`Intl.NumberFormat`), so moving to cents is a store change, not a UI one.
+- **Settlement only runs in the foreground.** The queue drains while the app is open; nothing settles in the background, and there's no server to reconcile against.
 - **No CI yet.** Everything runs locally.
+- **Accessibility was checked with tests and screenshots, not a screen reader.** Labels, roles and announcements are asserted in Jest, and the largest text sizes were checked on iOS. A pass with VoiceOver and TalkBack actually running, and large text on Android, is still to do.
+- **E2E runs against the dev build.** That's why the launch subflow has to drive the dev launcher and wait for Metro after a relaunch. A release build would make the flows faster and less timing-sensitive.
 
 ## What I'd build next
 
+Product:
 - **Pay in 4.** Split a purchase into instalments debited over the next rounds, with a missed-payment path when funds are short. It reuses holds, pending entries, the queue and the receipt.
-- CI running typecheck, lint, tests and both Maestro platforms.
+- A real market API behind `decideSettlement`, with idempotency keys so a retried settlement can't apply twice on the server either.
+- Haptics on settlement and battle results, and a chart you can scrub to read past balances.
+
+Engineering:
+- CI running typecheck, lint, tests and both Maestro platforms against a release build.
 - Integer minor units (cents).
+- An error boundary per tab, so one broken screen doesn't take down the app.
+- A shared `ListRow` for the tappable cards in Stable, Buy and History, which still repeat their row styling.
+- Copy pulled into one place for localisation; it's hard-coded English and US dollars.
+- README screenshots of the main screens in light and dark.
