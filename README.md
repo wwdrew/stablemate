@@ -80,11 +80,36 @@ Harness notes for anyone extending it: native tabs keep every tab mounted, so qu
 
 The app uses native modules (MMKV via Nitro, Reanimated), so it needs a **development build**; Expo Go won't work.
 
+### Prerequisites
+
+- **Node.js**: a current LTS (developed on Node 24) and npm.
+- **iOS**: macOS with Xcode and an iOS Simulator runtime installed.
+- **Android**: Android Studio with an SDK, an emulator image, and `ANDROID_HOME` set.
+- **E2E only**: [Maestro](https://docs.maestro.dev/getting-started/installing-maestro) (`curl -fsSL "https://get.maestro.mobile.dev" | bash`), which needs Java 17 or newer.
+
+### Build and run
+
+`ios/` and `android/` aren't committed; `expo run` generates them on the first build.
+
 ```bash
-cd StableMate
+git clone https://github.com/wwdrew/stablemate.git
+cd stablemate/StableMate
 npm install
-npx expo run:ios       # or: npx expo run:android
-npm start              # subsequent runs, once the dev build is installed
+
+npx expo run:ios       # builds, installs on a simulator and starts Metro
+npx expo run:android   # same, on a running emulator
+```
+
+The first build takes a few minutes. After that the dev build stays installed, so `npm start` is enough: Metro starts and the app reconnects to it.
+
+### Run the tests
+
+Jest, lint and the typecheck need no simulator (see [Testing](#testing)). The Maestro flows need the dev build installed and Metro running:
+
+```bash
+npm start                         # in one terminal
+adb reverse tcp:8081 tcp:8081     # Android only, so the emulator can reach Metro
+npm run e2e                       # or pick a device: maestro --device <id> test .maestro
 ```
 
 ## Stack
