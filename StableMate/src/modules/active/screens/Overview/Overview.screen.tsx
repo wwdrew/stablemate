@@ -1,6 +1,6 @@
 import { ScrollView, Text, View } from "react-native";
 
-import { STARTER_OPTIONS } from "@/constants/starters";
+import { STARTER_OPTIONS } from "@/data/starters";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import {
   useCash,

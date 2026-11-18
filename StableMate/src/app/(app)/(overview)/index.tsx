@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-import { screenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
+import { screenHeaderOptions } from "@/modules/active/navigation/headerOptions";
 import { OverviewScreen } from "@/modules/active/screens/Overview/Overview.screen";
 import { useColors } from "@/theme/colors";
 

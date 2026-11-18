@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 
 import { useMarketLot } from "@/api/useMarketLot";
-import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
+import { detailScreenHeaderOptions } from "@/modules/active/navigation/headerOptions";
 import { ListingDetailScreen } from "@/modules/active/screens/ListingDetail/ListingDetail.screen";
 import { useColors } from "@/theme/colors";
 

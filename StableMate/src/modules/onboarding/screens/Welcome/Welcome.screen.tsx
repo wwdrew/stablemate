@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { STARTER_OPTIONS } from "@/constants/starters";
+import { STARTER_OPTIONS } from "@/data/starters";
 import { type StarterId, useGameStore } from "@/store/game";
 import { makeStyles } from "@/theme/colors";
 

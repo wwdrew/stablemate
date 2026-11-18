@@ -2,7 +2,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 
 import { receiptTimeline } from "@/lib/timeline";
-import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
+import { detailScreenHeaderOptions } from "@/modules/active/navigation/headerOptions";
 import { ReceiptScreen } from "@/modules/active/screens/Receipt/Receipt.screen";
 import { useLedger, useLedgerEntry } from "@/store/game";
 import { useIsOnline } from "@/store/settings";

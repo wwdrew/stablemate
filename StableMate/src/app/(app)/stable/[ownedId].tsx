@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 
-import { detailScreenHeaderOptions } from "@/modules/active/navigation/largeTitleScreenOptions";
+import { detailScreenHeaderOptions } from "@/modules/active/navigation/headerOptions";
 import { OwnedDetailScreen } from "@/modules/active/screens/OwnedDetail/OwnedDetail.screen";
 import { pokemonFromOwned } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { useGameStore } from "@/store/game";
