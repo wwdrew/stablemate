@@ -1,4 +1,5 @@
 import { useGameStore } from "@/store/game";
+import { type BattleInput, resolveBattle } from "@/store/gameState";
 
 const g = () => useGameStore.getState();
 const s = () => g().state!;
@@ -7,6 +8,9 @@ beforeEach(() => {
   g().createState("squirtle");
   useGameStore.setState({ state: { ...s(), cash: 1000 } });
 });
+
+const battle = (input: BattleInput) =>
+  useGameStore.setState({ state: resolveBattle(s(), input) });
 
 const buy = (id = "L1", price = 300) =>
   g().purchaseListing({ listingId: id, slug: "gengar", name: "Gengar", markPrice: price, wins: 1, losses: 0 });
@@ -60,7 +64,7 @@ test("sale is pending with no credit, then settles to top of ledger", () => {
   expect(s().cash).toBe(700);
   expect(s().ledger[0]).toMatchObject({ type: "sale", status: "pending", amount: 300, balanceAfter: null });
   expect(g().sellOwned("squirtle-starter")).toEqual({ ok: false, reason: "last_pokemon" });
-  g().resolveBattle({ ownedId: "squirtle-starter", challengerSlug: "onix", challengerName: "Onix", won: true, prizeMoney: 100 });
+  battle({ ownedId: "squirtle-starter", challengerSlug: "onix", challengerName: "Onix", won: true, prizeMoney: 100 });
   expect(s().cash).toBe(800);
   g().applySettlement(sale.txnId, { ok: true });
   expect(s().cash).toBe(1100);
@@ -84,7 +88,7 @@ test("pending pokemon cannot battle; settlement is idempotent", () => {
   const r = buy();
   if (!r.ok) throw new Error("purchase rejected");
   const before = s();
-  g().resolveBattle({ ownedId: r.ownedId, challengerSlug: "onix", challengerName: "Onix", won: true, prizeMoney: 100 });
+  battle({ ownedId: r.ownedId, challengerSlug: "onix", challengerName: "Onix", won: true, prizeMoney: 100 });
   expect(s()).toBe(before);
   const txn = s().ledger[0]!.id;
   g().applySettlement(txn, { ok: false, reason: "sold_out" });

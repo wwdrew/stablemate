@@ -2,6 +2,7 @@ import { act, fireEvent, screen } from "@testing-library/react-native";
 import { Alert } from "react-native";
 
 import { useGameStore } from "@/store/game";
+import { resolveBattle } from "@/store/gameState";
 import { useSettingsStore } from "@/store/settings";
 
 import {
@@ -38,12 +39,14 @@ afterEach(() => {
 });
 
 function winPrize(prizeMoney: number) {
-  store().resolveBattle({
-    ownedId: "squirtle-starter",
-    challengerSlug: "onix",
-    challengerName: "Onix",
-    won: true,
-    prizeMoney,
+  useGameStore.setState({
+    state: resolveBattle(store().state!, {
+      ownedId: "squirtle-starter",
+      challengerSlug: "onix",
+      challengerName: "Onix",
+      won: true,
+      prizeMoney,
+    }),
   });
 }
 

@@ -8,7 +8,7 @@ The game is the hook; the transaction model is the point.
 
 | If you're interested in… | Look at |
 |---|---|
-| How money moves | [`src/store/game.ts`](StableMate/src/store/game.ts): holds, pending sales, `applySettlement` |
+| How money moves | [`src/store/gameState.ts`](StableMate/src/store/gameState.ts): holds, pending sales, `applySettlement`, as pure functions |
 | Offline / optimistic behaviour | [`src/api/useSettlementQueue.ts`](StableMate/src/api/useSettlementQueue.ts), [`src/api/settlement.ts`](StableMate/src/api/settlement.ts) |
 | Global state | [`src/store/`](StableMate/src/store): two persisted Zustand stores |
 | Tests | [`__tests__/`](StableMate/__tests__), [`test/fixtures.ts`](StableMate/test/fixtures.ts), [`TEST_SCENARIOS.md`](TEST_SCENARIOS.md) |
