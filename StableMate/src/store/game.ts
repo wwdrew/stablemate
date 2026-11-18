@@ -57,11 +57,6 @@ export type BattleRecord = {
   prizeMoney: number;
 };
 
-export type CashHistoryEntry = {
-  round: number;
-  cash: number;
-};
-
 export type OwnedPokemon = {
   id: string;
   speciesId: string;
@@ -76,7 +71,6 @@ export type GameState = {
   starterId: StarterId;
   roundsPlayed: number;
   cash: number;
-  cashHistory: CashHistoryEntry[];
   ledger: LedgerEntry[];
   battleHistory: BattleRecord[];
   purchasedListingIds: string[];
@@ -230,7 +224,6 @@ export const useGameStore = create<GameStore>()(
             starterId,
             roundsPlayed: 0,
             cash: 0,
-            cashHistory: [{ round: 0, cash: 0 }],
             ledger: [],
             battleHistory: [],
             purchasedListingIds: [],
@@ -314,10 +307,6 @@ export const useGameStore = create<GameStore>()(
               ...store.state,
               roundsPlayed,
               cash,
-              cashHistory: [
-                ...store.state.cashHistory,
-                { round: roundsPlayed, cash },
-              ],
               ledger,
               battleHistory: [battle, ...store.state.battleHistory],
               purchasedListingIds: [],
@@ -561,7 +550,6 @@ export const useGameStore = create<GameStore>()(
             ...state,
             roundsPlayed: state.roundsPlayed ?? 0,
             cash,
-            cashHistory: state.cashHistory ?? [{ round: 0, cash }],
             ledger: (state.ledger ?? []).map((entry) =>
               migrateLedgerEntry(entry),
             ),

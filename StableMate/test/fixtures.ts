@@ -54,7 +54,6 @@ export function seedGame({
     state: {
       ...state,
       cash,
-      cashHistory: [{ round: 0, cash }],
       stable: [
         ...state.stable,
         ...stable.map((owned) => ({ ...owned, pending: null })),
