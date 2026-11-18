@@ -282,7 +282,7 @@ Setup for all: O4 with Squirtle.
 - Expect: title, signed amount, subtitle, Type, Status, Round, Reference (= ledger id), and a timeline (H8)
 
 **H8 · Receipt timeline** [Both] ✅ RNTL
-- Each receipt shows how the money moved: `Funds held` → `Waiting to settle` (with `Settling now.` or `Queued until you’re back online.`) → `Purchase settled`, or `Purchase failed` → `Refunded`
+- Each receipt shows how the money moved: `Funds held` → `Waiting to settle` (with `Settling now.` or `Settles when you’re back online.`) → `Purchase settled`, or `Purchase failed` → `Refunded`
 - Sales: `Sale placed` → `Waiting for a buyer` → `Sale settled`, or `Sale failed` → `Back in your stable`. Prizes: `Prize paid`
 - A failed purchase's receipt has `View receipt` for its refund, and the refund links back (`timeline.test.ts` covers every branch)
 

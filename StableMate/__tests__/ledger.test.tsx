@@ -160,7 +160,7 @@ describe("H4 · receipts", () => {
     expect(receipt.getByText("Credits on settlement")).toBeOnTheScreen();
     expect(receipt.getByText("Sale placed")).toBeOnTheScreen();
     expect(receipt.getByText("Waiting for a buyer")).toBeOnTheScreen();
-    expect(receipt.getByText("Queued until you’re back online.")).toBeOnTheScreen();
+    expect(receipt.getByText("Settles when you’re back online.")).toBeOnTheScreen();
     expect(receipt.getByText("Sale settled")).toBeOnTheScreen();
     expect(receipt.getByText(`+${usd(gengar.markPrice)}`)).toBeOnTheScreen();
     expect(receipt.getByText("Market sale · Round 0")).toBeOnTheScreen();

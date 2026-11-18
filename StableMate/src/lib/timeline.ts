@@ -1,4 +1,5 @@
 import { settlementFailureMessage } from "@/api/settlement";
+import { settlementWaitCopy } from "@/lib/ledger";
 import { formatMoney } from "@/lib/money";
 import type { LedgerEntry } from "@/store/game";
 
@@ -20,11 +21,6 @@ function step(
   { detail = null, at = null, linkedEntryId = null }: Partial<TimelineStep> = {},
 ): TimelineStep {
   return { title, detail, at, state, linkedEntryId };
-}
-
-/** While pending: settling now, or queued until the network is back. */
-function waitingDetail(isOnline: boolean): string {
-  return isOnline ? "Settling now." : "Queued until you’re back online.";
 }
 
 /**
@@ -69,7 +65,7 @@ export function receiptTimeline(
       if (entry.status === "pending") {
         return [
           held,
-          step("Waiting to settle", "current", { detail: waitingDetail(isOnline) }),
+          step("Waiting to settle", "current", { detail: settlementWaitCopy(isOnline) }),
           step("Purchase settled", "upcoming"),
         ];
       }
@@ -103,7 +99,7 @@ export function receiptTimeline(
       if (entry.status === "pending") {
         return [
           placed,
-          step("Waiting for a buyer", "current", { detail: waitingDetail(isOnline) }),
+          step("Waiting for a buyer", "current", { detail: settlementWaitCopy(isOnline) }),
           step("Sale settled", "upcoming"),
         ];
       }

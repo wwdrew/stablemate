@@ -30,7 +30,7 @@ test("a pending purchase is held and waiting, with settlement still to come", ()
     ["Waiting to settle", "current"],
     ["Purchase settled", "upcoming"],
   ]);
-  expect(steps[1]!.detail).toBe("Queued until you’re back online.");
+  expect(steps[1]!.detail).toBe("Settles when you’re back online.");
   expect(receiptTimeline(entry({}), [], true)[1]!.detail).toBe("Settling now.");
 });
 

@@ -1,5 +1,10 @@
 import type { LedgerEntry, LedgerEntryType, TransactionStatus } from "@/store/game";
 
+/** How a pending transaction will settle: now, or once the network is back. */
+export function settlementWaitCopy(isOnline: boolean): string {
+  return isOnline ? "Settling now." : "Settles when you’re back online.";
+}
+
 export function typeLabel(type: LedgerEntryType): string {
   switch (type) {
     case "purchase":
