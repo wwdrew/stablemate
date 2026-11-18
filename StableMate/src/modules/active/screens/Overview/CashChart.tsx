@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import Svg, { Line, Path, Text as SvgText } from "react-native-svg";
 
+import { Card } from "@/components/Card";
+import { SectionLabel } from "@/components/SectionLabel";
 import { formatMoney } from "@/lib/money";
 import { useLedger, useRoundsPlayed } from "@/store/game";
 import { makeStyles, useColors } from "@/theme/colors";
@@ -55,8 +57,8 @@ export function CashChart() {
   const hasData = points.length > 1;
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.label}>Cash over time</Text>
+    <Card style={styles.card}>
+      <SectionLabel>Cash over time</SectionLabel>
       <View
         style={styles.plot}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
@@ -135,23 +137,13 @@ export function CashChart() {
         )}
       </View>
       <Text style={styles.axisTitle}>Round</Text>
-    </View>
+    </Card>
   );
 }
 
 const useStyles = makeStyles((colors) => ({
   card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.separator,
-    padding: 16,
     gap: 8,
-  },
-  label: {
-    fontSize: 12,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: colors.textTertiary,
   },
   plot: {
     width: "100%",

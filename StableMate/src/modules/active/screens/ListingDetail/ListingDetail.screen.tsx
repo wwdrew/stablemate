@@ -1,15 +1,14 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Text, View } from "react-native";
 
 import type { MarketListing } from "@/api/marketLot";
+import { EmptyState } from "@/components/EmptyState";
 import { formatMoney } from "@/lib/money";
 import { BuyAction } from "@/modules/active/screens/PokemonDetail/BuyAction";
 import { PokemonDetailScreen } from "@/modules/active/screens/PokemonDetail/PokemonDetail.screen";
 import { pokemonFromListing } from "@/modules/active/screens/PokemonDetail/pokemonInstance";
 import { type PurchaseResult, useCash, useGameStore } from "@/store/game";
 import { useIsOnline } from "@/store/settings";
-import { makeStyles } from "@/theme/colors";
 
 type PurchaseFailure = Extract<PurchaseResult, { ok: false }>["reason"];
 
@@ -68,7 +67,6 @@ function purchaseStatusMessage(args: {
 }
 
 export function ListingDetailScreen({ listing, isLoading }: ListingDetailScreenProps) {
-  const styles = useStyles();
   const router = useRouter();
   const cash = useCash();
   const isOnline = useIsOnline();
@@ -78,19 +76,16 @@ export function ListingDetailScreen({ listing, isLoading }: ListingDetailScreenP
   const pokemon = listing ? pokemonFromListing(listing) : null;
 
   if (isLoading) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.body}>Loading…</Text>
-      </View>
-    );
+    return <EmptyState fill body="Loading…" />;
   }
 
   if (!pokemon || !listing) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Listing unavailable</Text>
-        <Text style={styles.body}>This market lot entry isn’t for sale anymore.</Text>
-      </View>
+      <EmptyState
+        fill
+        title="Listing unavailable"
+        body="This market lot entry isn’t for sale anymore."
+      />
     );
   }
 
@@ -137,22 +132,3 @@ export function ListingDetailScreen({ listing, isLoading }: ListingDetailScreenP
   );
 }
 
-const useStyles = makeStyles((colors) => ({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-    gap: 8,
-    backgroundColor: colors.background,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
-  },
-}));

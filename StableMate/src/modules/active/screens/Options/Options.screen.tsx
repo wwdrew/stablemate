@@ -1,6 +1,8 @@
 import { Alert, Pressable, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Card } from "@/components/Card";
+import { SectionLabel } from "@/components/SectionLabel";
 import { type SegmentOption, SegmentedControl } from "@/components/SegmentedControl";
 import { useGameStore } from "@/store/game";
 import {
@@ -54,7 +56,7 @@ export function OptionsScreen() {
       <Text style={styles.title}>Options</Text>
       <Text style={styles.subtitle}>Demo controls and game settings.</Text>
 
-      <View style={styles.row}>
+      <Card style={styles.row}>
         <View style={styles.rowCopy}>
           <Text style={styles.rowTitle}>Simulate network</Text>
           <Text style={styles.rowBody}>
@@ -69,10 +71,10 @@ export function OptionsScreen() {
           onValueChange={setIsOnline}
           trackColor={{ false: colors.fill, true: colors.accent }}
         />
-      </View>
+      </Card>
 
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Battle outcome</Text>
+        <SectionLabel>Battle outcome</SectionLabel>
         <SegmentedControl
           options={BATTLE_OUTCOME_OPTIONS}
           value={battleOutcome}
@@ -81,7 +83,7 @@ export function OptionsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Settlement outcome</Text>
+        <SectionLabel>Settlement outcome</SectionLabel>
         <SegmentedControl
           options={SETTLEMENT_OUTCOME_OPTIONS}
           value={settlementOutcome}
@@ -90,7 +92,7 @@ export function OptionsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Danger zone</Text>
+        <SectionLabel>Danger zone</SectionLabel>
         <Pressable onPress={confirmReset} style={styles.dangerButton}>
           <Text style={styles.dangerLabel}>Reset game</Text>
           <Text style={styles.dangerHint}>
@@ -123,10 +125,6 @@ const useStyles = makeStyles((colors) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.separator,
-    padding: 16,
   },
   rowCopy: {
     flex: 1,
@@ -144,12 +142,6 @@ const useStyles = makeStyles((colors) => ({
   },
   section: {
     gap: 8,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: colors.textTertiary,
   },
   dangerButton: {
     backgroundColor: colors.surface,

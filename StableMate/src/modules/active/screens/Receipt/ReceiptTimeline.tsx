@@ -1,6 +1,8 @@
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
+import { Card } from "@/components/Card";
+import { SectionLabel } from "@/components/SectionLabel";
 import type { TimelineStep } from "@/lib/timeline";
 import { makeStyles } from "@/theme/colors";
 
@@ -12,8 +14,8 @@ export function ReceiptTimeline({ steps }: { steps: TimelineStep[] }) {
   const styles = useStyles();
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.heading}>Timeline</Text>
+    <Card>
+      <SectionLabel style={styles.heading}>Timeline</SectionLabel>
       {steps.map((step, index) => {
         const last = index === steps.length - 1;
         return (
@@ -40,24 +42,14 @@ export function ReceiptTimeline({ steps }: { steps: TimelineStep[] }) {
           </View>
         );
       })}
-    </View>
+    </Card>
   );
 }
 
 const DOT = 12;
 
 const useStyles = makeStyles((colors) => ({
-  card: {
-    borderWidth: 1,
-    borderColor: colors.separator,
-    backgroundColor: colors.surface,
-    padding: 16,
-  },
   heading: {
-    fontSize: 12,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: colors.textTertiary,
     marginBottom: 12,
   },
   step: {

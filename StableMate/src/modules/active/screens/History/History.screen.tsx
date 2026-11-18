@@ -3,6 +3,9 @@ import { Link } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { Card } from "@/components/Card";
+import { EmptyState } from "@/components/EmptyState";
+import { SectionLabel } from "@/components/SectionLabel";
 import { type SegmentOption, SegmentedControl } from "@/components/SegmentedControl";
 import { filterLedger, type LedgerFilter, statusLabel, typeLabel } from "@/lib/ledger";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
@@ -105,8 +108,8 @@ export function HistoryScreen() {
             Money in and out of your wallet. Every purchase, sale and prize
             lands here.
           </Text>
-          <View style={styles.balanceCard}>
-            <Text style={styles.balanceLabel}>Current balance</Text>
+          <Card style={styles.balanceCard}>
+            <SectionLabel>Current balance</SectionLabel>
             <Text style={styles.balanceValue}>{formatMoney(cash)}</Text>
             {pendingCredits > 0 ? (
               <Text style={styles.balancePending}>
@@ -118,7 +121,7 @@ export function HistoryScreen() {
                 ? "1 transaction"
                 : `${ledger.length} transactions`}
             </Text>
-          </View>
+          </Card>
           {ledger.length > 0 ? (
             <SegmentedControl options={FILTER_OPTIONS} value={filter} onChange={setFilter} />
           ) : null}
@@ -126,17 +129,12 @@ export function HistoryScreen() {
       }
       ListEmptyComponent={
         filter !== "all" && ledger.length > 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyBody}>{FILTER_EMPTY_COPY[filter]}</Text>
-          </View>
+          <EmptyState body={FILTER_EMPTY_COPY[filter]} />
         ) : (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No transactions yet</Text>
-            <Text style={styles.emptyBody}>
-              Win battle prizes or trade on the market — each cash movement
-              shows up in this ledger.
-            </Text>
-          </View>
+          <EmptyState
+            title="No transactions yet"
+            body="Win battle prizes or trade on the market — each cash movement shows up in this ledger."
+          />
         )
       }
       renderItem={({ item }) => <TransactionRow item={item} />}
@@ -164,17 +162,7 @@ const useStyles = makeStyles((colors) => ({
     color: colors.textSecondary,
   },
   balanceCard: {
-    borderWidth: 1,
-    borderColor: colors.separator,
-    backgroundColor: colors.surface,
-    padding: 16,
     gap: 4,
-  },
-  balanceLabel: {
-    fontSize: 12,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: colors.textTertiary,
   },
   balanceValue: {
     fontSize: 28,
@@ -256,22 +244,5 @@ const useStyles = makeStyles((colors) => ({
   },
   separator: {
     height: 10,
-  },
-  empty: {
-    borderWidth: 1,
-    borderColor: colors.separator,
-    backgroundColor: colors.surface,
-    padding: 20,
-    gap: 8,
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  emptyBody: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
   },
 }));

@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
+import { EmptyState } from "@/components/EmptyState";
 import { settlementWaitCopy } from "@/lib/ledger";
 import { formatMoney } from "@/lib/money";
 import { BattleAction } from "@/modules/active/screens/PokemonDetail/BattleAction";
@@ -66,10 +67,7 @@ export function OwnedDetailScreen({ owned }: OwnedDetailScreenProps) {
 
   if (!pokemon || !owned) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Pokémon not found</Text>
-        <Text style={styles.body}>This entry isn’t in your stable anymore.</Text>
-      </View>
+      <EmptyState fill title="Pokémon not found" body="This entry isn’t in your stable anymore." />
     );
   }
 
@@ -118,22 +116,5 @@ export function OwnedDetailScreen({ owned }: OwnedDetailScreenProps) {
 const useStyles = makeStyles((colors) => ({
   actions: {
     gap: 12,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-    gap: 8,
-    backgroundColor: colors.background,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
   },
 }));

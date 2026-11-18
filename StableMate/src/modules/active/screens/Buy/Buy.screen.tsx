@@ -2,8 +2,9 @@ import { LegendList } from "@legendapp/list/react-native";
 import { Link } from "expo-router";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-import { useMarketLot } from "@/api/useMarketLot";
 import type { MarketListing } from "@/api/marketLot";
+import { useMarketLot } from "@/api/useMarketLot";
+import { EmptyState } from "@/components/EmptyState";
 import { formatMoney } from "@/lib/money";
 import { formatTypes } from "@/lib/pokemon";
 import { makeStyles } from "@/theme/colors";
@@ -53,9 +54,7 @@ export function BuyScreen() {
 
   if (isError) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.emptyTitle}>Couldn’t load market lot</Text>
-      </View>
+      <EmptyState fill title="Couldn’t load market lot" />
     );
   }
 
@@ -73,13 +72,10 @@ export function BuyScreen() {
         </Text>
       }
       ListEmptyComponent={
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No listings yet</Text>
-          <Text style={styles.emptyBody}>
-            Seeded lot Pokémon will land here. Tap through to inspect and
-            purchase.
-          </Text>
-        </View>
+        <EmptyState
+          title="No listings yet"
+          body="Seeded lot Pokémon will land here. Tap through to inspect and purchase."
+        />
       }
       renderItem={({ item }) => <ListingRow item={item} />}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -138,23 +134,6 @@ const useStyles = makeStyles((colors) => ({
   },
   separator: {
     height: 10,
-  },
-  empty: {
-    borderWidth: 1,
-    borderColor: colors.separator,
-    backgroundColor: colors.surface,
-    padding: 20,
-    gap: 8,
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  emptyBody: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
   },
   centered: {
     flex: 1,

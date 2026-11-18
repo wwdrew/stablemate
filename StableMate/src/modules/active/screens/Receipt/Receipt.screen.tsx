@@ -1,5 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 
+import { Card } from "@/components/Card";
+import { EmptyState } from "@/components/EmptyState";
 import { typeLabel } from "@/lib/ledger";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import type { TimelineStep } from "@/lib/timeline";
@@ -30,10 +32,7 @@ export function ReceiptScreen({ entry, timeline }: ReceiptScreenProps) {
   const styles = useStyles();
   if (!entry) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Transaction not found</Text>
-        <Text style={styles.body}>This entry isn’t in your ledger anymore.</Text>
-      </View>
+      <EmptyState fill title="Transaction not found" body="This entry isn’t in your ledger anymore." />
     );
   }
 
@@ -66,7 +65,7 @@ export function ReceiptScreen({ entry, timeline }: ReceiptScreenProps) {
 
       <ReceiptTimeline steps={timeline} />
 
-      <View style={styles.card}>
+      <Card style={styles.details}>
         {rows.map((row) => (
           <View key={row.label} style={styles.row}>
             <Text style={styles.rowLabel}>{row.label}</Text>
@@ -75,7 +74,7 @@ export function ReceiptScreen({ entry, timeline }: ReceiptScreenProps) {
             </Text>
           </View>
         ))}
-      </View>
+      </Card>
     </ScrollView>
   );
 }
@@ -113,11 +112,7 @@ const useStyles = makeStyles((colors) => ({
     fontSize: 15,
     color: colors.textSecondary,
   },
-  card: {
-    borderWidth: 1,
-    borderColor: colors.separator,
-    backgroundColor: colors.surface,
-    padding: 16,
+  details: {
     gap: 12,
   },
   row: {
@@ -135,22 +130,5 @@ const useStyles = makeStyles((colors) => ({
     fontWeight: "600",
     color: colors.text,
     textAlign: "right",
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-    gap: 8,
-    backgroundColor: colors.background,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
   },
 }));

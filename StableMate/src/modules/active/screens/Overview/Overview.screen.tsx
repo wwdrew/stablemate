@@ -2,22 +2,30 @@ import { ScrollView, Text, View } from "react-native";
 
 import { STARTER_OPTIONS } from "@/constants/starters";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
-import { useGameStore, useNetWorth, usePendingCredits } from "@/store/game";
+import {
+  useCash,
+  useGameStore,
+  useNetWorth,
+  usePendingCredits,
+  useRoundsPlayed,
+} from "@/store/game";
 import { makeStyles } from "@/theme/colors";
 
 import { CashChart } from "./CashChart";
-import { CashDisplay } from "./CashDisplay";
-import { RoundsDisplay } from "./RoundsDisplay";
+import { StatCard } from "./StatCard";
 
 export function OverviewScreen() {
   const styles = useStyles();
-  const state = useGameStore((store) => store.state);
+  const starterId = useGameStore((store) => store.state?.starterId);
+  const stableSize = useGameStore((store) => store.state?.stable.length ?? 0);
+  const cash = useCash();
+  const roundsPlayed = useRoundsPlayed();
   const netWorth = useNetWorth();
   const pendingCredits = usePendingCredits();
 
-  const starter = STARTER_OPTIONS.find(
-    (option) => option.id === state?.starterId,
-  );
+  const starter = STARTER_OPTIONS.find((option) => option.id === starterId);
+  const pendingNote =
+    pendingCredits > 0 ? ` · ${formatSignedMoney(pendingCredits)} sales pending` : "";
 
   return (
     <ScrollView
@@ -30,31 +38,20 @@ export function OverviewScreen() {
       </Text>
 
       <View style={styles.row}>
-        <CashDisplay />
-        <RoundsDisplay />
+        <StatCard label="Cash" value={formatMoney(cash)} style={styles.half} />
+        <StatCard label="Rounds played" value={String(roundsPlayed)} style={styles.half} />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Net worth</Text>
-        <Text style={styles.value}>{formatMoney(netWorth)}</Text>
-        <Text style={styles.meta}>
-          Cash + stable at mark price
-          {pendingCredits > 0 ? ` · ${formatSignedMoney(pendingCredits)} sales pending` : ""}
-        </Text>
-      </View>
+      <StatCard
+        label="Net worth"
+        value={formatMoney(netWorth)}
+        meta={`Cash + stable at mark price${pendingNote}`}
+      />
 
       <CashChart />
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Starter</Text>
-        <Text style={styles.value}>{starter?.name ?? "—"}</Text>
-        <Text style={styles.meta}>{starter?.type ?? ""}</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>Stable size</Text>
-        <Text style={styles.value}>{state?.stable?.length ?? 0}</Text>
-      </View>
+      <StatCard label="Starter" value={starter?.name ?? "—"} meta={starter?.type} />
+      <StatCard label="Stable size" value={String(stableSize)} />
     </ScrollView>
   );
 }
@@ -74,30 +71,11 @@ const useStyles = makeStyles((colors) => ({
     color: colors.textSecondary,
     marginBottom: 4,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.separator,
-    padding: 16,
-    gap: 4,
-  },
-  label: {
-    fontSize: 12,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: colors.textTertiary,
-  },
-  value: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  meta: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
   row: {
     flexDirection: "row",
     gap: 12,
+  },
+  half: {
+    flex: 1,
   },
 }));
